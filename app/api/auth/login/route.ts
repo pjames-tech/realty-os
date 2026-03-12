@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  cookies().set(ADMIN_SESSION_COOKIE, getAdminSessionToken(), {
+  (await cookies()).set(ADMIN_SESSION_COOKIE, getAdminSessionToken(), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",

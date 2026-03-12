@@ -5,7 +5,7 @@ import { CLIENT_SESSION_COOKIE } from "@/lib/auth";
 export const runtime = "nodejs";
 
 export async function POST() {
-  cookies().set(CLIENT_SESSION_COOKIE, "", {
+  (await cookies()).set(CLIENT_SESSION_COOKIE, "", {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",

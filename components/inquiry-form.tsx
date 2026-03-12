@@ -1,200 +1,255 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-const budgetOptions = ["Under $500k", "$500k - $1M", "Above $1M"];
-const propertyOptions = ["Single Family", "Condo", "Townhouse", "Apartment"];
-const timelineOptions = ["ASAP", "3-6 Months", "Just Browsing"];
+const TOTAL_STEPS = 6;
+const budgetOptions = ["Under $500k", "$500k - $1M", "$1M - $3M", "Above $3M"];
+const propertyOptions = [
+  { label: "Single Family", icon: "🏡" },
+  { label: "Condo", icon: "🏢" },
+  { label: "Townhouse", icon: "🏘️" },
+  { label: "Apartment", icon: "🏙️" },
+];
+const timelineOptions = ["ASAP", "1-3 Months", "3-6 Months", "Just Browsing"];
 
 export function InquiryForm() {
+  const router = useRouter();
+  const [step, setStep] = useState(1);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [budget, setBudget] = useState("$500k - $1M");
+  const [budget, setBudget] = useState("");
   const [location, setLocation] = useState("");
-  const [propertyType, setPropertyType] = useState("Single Family");
-  const [timeline, setTimeline] = useState("ASAP");
+  const [propertyType, setPropertyType] = useState("");
+  const [timeline, setTimeline] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
-  const progress = Math.max(
-    1,
-    [
-      fullName.trim(),
-      email.trim(),
-      budget,
-      location.trim(),
-      propertyType,
-      timeline
-    ].filter(Boolean).length
-  );
+  function canAdvance(): boolean {
+    switch (step) {
+      case 1: return true; // welcome
+      case 2: return fullName.trim().length > 0 && email.trim().length > 0;
+      case 3: return budget.length > 0;
+      case 4: return location.trim().length > 0;
+      case 5: return propertyType.length > 0;
+      case 6: return timeline.length > 0;
+      default: return false;
+    }
+  }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!fullName.trim() || !email.trim() || !location.trim()) {
-      setError("Full name, email, and preferred location are required.");
+  async function handleNext() {
+    setError("");
+    if (step < TOTAL_STEPS) {
+      setStep(step + 1);
       return;
     }
 
+    // Final step → submit
     setSubmitting(true);
-    setError("");
-    setSuccess("");
-
     try {
-      const message = [
-        `My name is ${fullName}.`,
-        `My budget is ${budget}.`,
-        `Preferred location is ${location}.`,
-        `Property type is ${propertyType}.`,
-        `My timeline is ${timeline}.`
-      ].join(" ");
-
-      const response = await fetch("/api/leads/ingest", {
+      const res = await fetch("/api/client/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: fullName,
           email,
-          source: "website-inquiry",
-          message
-        })
+          budget,
+          location,
+          propertyType,
+          timeline,
+        }),
       });
 
-      const payload = await response.json();
-      if (!response.ok) {
-        throw new Error(payload.error || "Could not submit inquiry");
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Sign up failed");
 
-      setSuccess(
-        payload.assistantReply ||
-          "Your inquiry has been submitted. Continue in the client portal to track it."
-      );
-    } catch (submissionError) {
-      setError(
-        submissionError instanceof Error
-          ? submissionError.message
-          : "Could not submit inquiry"
-      );
-    } finally {
+      // Auto-logged in by the API → go to dashboard
+      router.push("/portal");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
       setSubmitting(false);
     }
+  }
+
+  function handleBack() {
+    if (step > 1) setStep(step - 1);
   }
 
   return (
     <main className="inquiry-shell">
       <div className="inquiry-wrapper">
+        {/* Top bar */}
         <div className="inquiry-top">
-          <Link className="back-link" href="/">
-            Back
-          </Link>
-          <h1>RealtyOS Inquiry</h1>
+          {step > 1 ? (
+            <button className="back-link" onClick={handleBack} type="button">
+              ← Back
+            </button>
+          ) : (
+            <Link className="back-link" href="/">
+              ← Home
+            </Link>
+          )}
+          <h1>RealtyOS</h1>
           <div />
         </div>
 
+        {/* Progress */}
         <div className="inquiry-progress-head">
-          <div>
-            <strong>Your Preferences</strong>
-          </div>
-          <span>
-            {progress} of 6
-          </span>
+          <strong>Step {step} of {TOTAL_STEPS}</strong>
+          <span>{Math.round((step / TOTAL_STEPS) * 100)}%</span>
         </div>
         <div className="inquiry-progress">
-          <div style={{ width: `${(progress / 6) * 100}%` }} />
+          <div style={{ width: `${(step / TOTAL_STEPS) * 100}%` }} />
         </div>
 
-        <form className="inquiry-form" onSubmit={handleSubmit}>
-          <section className="inquiry-copy">
-            <h2>Let&apos;s find your perfect place</h2>
-            <p>We&apos;ll use this to curate a custom list of homes for you.</p>
-          </section>
+        {/* Steps */}
+        <div className="inquiry-form">
+          {step === 1 && (
+            <section className="inquiry-copy">
+              <span className="marketing-kicker">Get Started</span>
+              <h2>Let&apos;s find your dream home</h2>
+              <p>
+                Answer a few quick questions and our AI will curate a
+                personalized list of properties just for you. It only takes
+                2 minutes.
+              </p>
+            </section>
+          )}
 
-          <label className="inquiry-label">
-            <span>Full Name</span>
-            <input
-              placeholder="Sarah Johnson"
-              value={fullName}
-              onChange={(event) => setFullName(event.target.value)}
-            />
-          </label>
+          {step === 2 && (
+            <>
+              <section className="inquiry-copy">
+                <h2>Tell us about yourself</h2>
+                <p>We&apos;ll use this to set up your account.</p>
+              </section>
+              <label className="inquiry-label">
+                <span>Full Name</span>
+                <input
+                  placeholder="e.g. Alex Thompson"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  autoFocus
+                />
+              </label>
+              <label className="inquiry-label">
+                <span>Email Address</span>
+                <input
+                  type="email"
+                  placeholder="alex@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </label>
+            </>
+          )}
 
-          <label className="inquiry-label">
-            <span>Email Address</span>
-            <input
-              placeholder="sarah@example.com"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-            />
-          </label>
+          {step === 3 && (
+            <>
+              <section className="inquiry-copy">
+                <h2>What&apos;s your budget?</h2>
+                <p>This helps us filter properties in your range.</p>
+              </section>
+              <div className="option-stack">
+                {budgetOptions.map((opt) => (
+                  <button
+                    key={opt}
+                    className={`select-card ${budget === opt ? "select-card-active" : ""}`}
+                    onClick={() => setBudget(opt)}
+                    type="button"
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
 
-          <div className="inquiry-label">
-            <span>What is your budget?</span>
-            <div className="option-stack">
-              {budgetOptions.map((option) => (
-                <button
-                  key={option}
-                  className={`select-card ${budget === option ? "select-card-active" : ""}`}
-                  onClick={() => setBudget(option)}
-                  type="button"
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
+          {step === 4 && (
+            <>
+              <section className="inquiry-copy">
+                <h2>Where are you looking?</h2>
+                <p>Enter your preferred city, neighborhood, or zip code.</p>
+              </section>
+              <label className="inquiry-label">
+                <span>Preferred Location</span>
+                <input
+                  placeholder="e.g. Austin, TX or 90210"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  autoFocus
+                />
+              </label>
+            </>
+          )}
 
-          <label className="inquiry-label">
-            <span>Preferred Location</span>
-            <input
-              placeholder="e.g. Austin, TX"
-              value={location}
-              onChange={(event) => setLocation(event.target.value)}
-            />
-          </label>
+          {step === 5 && (
+            <>
+              <section className="inquiry-copy">
+                <h2>What type of property?</h2>
+                <p>Pick the property type that fits your lifestyle.</p>
+              </section>
+              <div className="property-grid">
+                {propertyOptions.map((opt) => (
+                  <button
+                    key={opt.label}
+                    className={`property-card ${propertyType === opt.label ? "property-card-active" : ""}`}
+                    onClick={() => setPropertyType(opt.label)}
+                    type="button"
+                  >
+                    <span style={{ fontSize: "1.8rem" }}>{opt.icon}</span>
+                    <strong>{opt.label}</strong>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
 
-          <div className="inquiry-label">
-            <span>Property Type</span>
-            <div className="property-grid">
-              {propertyOptions.map((option) => (
-                <button
-                  key={option}
-                  className={`property-card ${
-                    propertyType === option ? "property-card-active" : ""
-                  }`}
-                  onClick={() => setPropertyType(option)}
-                  type="button"
-                >
-                  <strong>{option}</strong>
-                </button>
-              ))}
-            </div>
-          </div>
+          {step === 6 && (
+            <>
+              <section className="inquiry-copy">
+                <h2>When do you want to move?</h2>
+                <p>This helps us prioritize the best matches for you.</p>
+              </section>
+              <div className="option-stack">
+                {timelineOptions.map((opt) => (
+                  <button
+                    key={opt}
+                    className={`select-card ${timeline === opt ? "select-card-active" : ""}`}
+                    onClick={() => setTimeline(opt)}
+                    type="button"
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
 
-          <div className="inquiry-label">
-            <span>Desired Move-in Timeline</span>
-            <div className="chip-row">
-              {timelineOptions.map((option) => (
-                <button
-                  key={option}
-                  className={`timeline-chip ${timeline === option ? "timeline-chip-active" : ""}`}
-                  onClick={() => setTimeline(option)}
-                  type="button"
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <button className="inquiry-submit" disabled={submitting} type="submit">
-            {submitting ? "Submitting..." : "Continue"}
+          {/* Action */}
+          <button
+            className="inquiry-submit"
+            disabled={!canAdvance() || submitting}
+            onClick={handleNext}
+            type="button"
+          >
+            {submitting
+              ? "Setting up your account..."
+              : step === TOTAL_STEPS
+              ? "Create My Account →"
+              : "Continue →"}
           </button>
 
-          {success ? <p className="form-success">{success}</p> : null}
-          {error ? <p className="form-error">{error}</p> : null}
-        </form>
+          {error && <p className="form-error">{error}</p>}
+
+          {step === 1 && (
+            <p className="inquiry-login-link">
+              Already have an account?{" "}
+              <Link href="/portal/login">Log in</Link>
+            </p>
+          )}
+        </div>
       </div>
     </main>
   );

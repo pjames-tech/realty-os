@@ -6,7 +6,7 @@ import { readState } from "@/lib/store";
 export const runtime = "nodejs";
 
 export async function GET() {
-  const leadId = cookies().get(CLIENT_SESSION_COOKIE)?.value;
+  const leadId = (await cookies()).get(CLIENT_SESSION_COOKIE)?.value;
   if (!leadId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

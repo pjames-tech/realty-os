@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No client record found" }, { status: 404 });
   }
 
-  cookies().set(CLIENT_SESSION_COOKIE, lead.id, {
+  (await cookies()).set(CLIENT_SESSION_COOKIE, lead.id, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
