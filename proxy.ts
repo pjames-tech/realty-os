@@ -21,7 +21,7 @@ function isProtectedClientPage(pathname: string): boolean {
   return pathname.startsWith("/portal") && pathname !== "/portal/login";
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const adminToken = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
   const clientToken = request.cookies.get(CLIENT_SESSION_COOKIE)?.value;
