@@ -1,21 +1,25 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { CLIENT_SESSION_COOKIE } from "@/lib/auth";
-import { readState } from "@/lib/store";
+import { requireClient } from "@/lib/auth-config";
+import { getLeadById } from "@/lib/db-helpers";
+import { prismaLeadToLeadRecord } from "@/lib/db-mappers";
+import { AuthError } from "@/lib/auth-config";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  const leadId = (await cookies()).get(CLIENT_SESSION_COOKIE)?.value;
-  if (!leadId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  try {
+    const clientLead = await requireClient();
 
-  const state = await readState();
-  const lead = state.leads[leadId];
-  if (!lead) {
-    return NextResponse.json({ error: "Lead not found" }, { status: 404 });
-  }
+    const fullLead = await getLeadById(clientLead.id);
+    if (!fullLead) {
+      return NextResponse.json({ error: "Lead not found" }, { status: 404 });
+    }
 
-  return NextResponse.json({ lead });
+    return NextResponse.json({ lead: prismaLeadToLeadRecord(fullLead) });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
 }

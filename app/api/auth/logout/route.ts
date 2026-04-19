@@ -1,17 +1,16 @@
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
-import { ADMIN_SESSION_COOKIE } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { signOutClient } from "@/lib/auth-config";
 
 export const runtime = "nodejs";
 
-export async function POST() {
-  (await cookies()).set(ADMIN_SESSION_COOKIE, "", {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 0
-  });
+export async function POST(_request: NextRequest) {
+  // Sign out of Supabase (admin/agent session)
+  const supabase = await createClient();
+  await supabase.auth.signOut();
 
-  return NextResponse.json({ ok: true });
+  // Also clear client session cookie
+  await signOutClient();
+
+  return NextResponse.json({ ok: true, message: "Logged out successfully" });
 }

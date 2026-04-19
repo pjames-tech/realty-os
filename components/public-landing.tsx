@@ -2,292 +2,343 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { useEffect, useRef, useState } from "react";
 
-const LISTINGS = [
+/* ── Counting animation hook ── */
+function useCountUp(end: number, suffix: string, duration: number = 1800) {
+  const [display, setDisplay] = useState("0" + suffix);
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting && !started) setStarted(true); },
+      { threshold: 0.5 }
+    );
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [started]);
+
+  useEffect(() => {
+    if (!started) return;
+    const start = performance.now();
+    const step = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      setDisplay(Math.round(eased * end) + suffix);
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [started, end, suffix, duration]);
+
+  return { ref, display };
+}
+
+/* ── Scroll-reveal hook ── */
+function useReveal() {
+  const ref = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    const el = ref.current;
+    el.style.opacity = "0";
+    el.style.transform = "translateY(32px)";
+    el.style.transition = "opacity 0.7s ease, transform 0.7s ease";
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.style.opacity = "1";
+          el.style.transform = "translateY(0)";
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return ref;
+}
+
+const STATS = [
+  { value: "40%", label: "LEAD CONVERSION VS AVERAGE", sub: "Avg. Portfolio Growth" },
+  { value: "3s", label: "RESPONSE TIME", sub: "● 300x Faster Than Human" },
+  { value: "10k+", label: "LEADS QUALIFYING MONTHLY", sub: "Trusted By Top Agencies" },
+  { value: "24/7", label: "OPERATION TIME", sub: "Never Miss A Lead" },
+];
+
+const FEATURES = [
   {
-    img: "/property-1.png",
-    badge: "For Sale",
-    price: "$1,250,000",
-    name: "Sunset Valley Estate",
-    location: "Austin, TX 78701",
-    beds: 4,
-    baths: 3,
-    sqft: "3,200",
+    icon: (<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>),
+    title: "Instant Lead Ingest",
+    desc: "Connect your lead sources and ingest prospects in under 3 seconds automatically.",
   },
   {
-    img: "/property-2.png",
-    badge: "New Listing",
-    price: "$875,000",
-    name: "Oak Ridge Manor",
-    location: "Denver, CO 80203",
-    beds: 3,
-    baths: 2,
-    sqft: "2,800",
+    icon: (<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>),
+    title: "AI Qualification",
+    desc: "Automatically capture Budget, Timeline, Location, and Property Type with natural dialogue.",
   },
   {
-    img: "/property-3.png",
-    badge: "For Rent",
-    price: "$5,400/mo",
-    name: "Skyline Loft",
-    location: "Seattle, WA 98107",
-    beds: 2,
-    baths: 2,
-    sqft: "1,500",
+    icon: (<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>),
+    title: "Auto-Tagging",
+    desc: "Leads are instantly categorized and scored for your CRM with smart priority tags.",
   },
   {
-    img: "/property-4.png",
-    badge: "For Sale",
-    price: "$2,900,000",
-    name: "The Heights Villa",
-    location: "Scottsdale, AZ 85251",
-    beds: 5,
-    baths: 4,
-    sqft: "4,800",
+    icon: (<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>),
+    title: "24/7 Availability",
+    desc: "Never miss a midnight lead again with our always-on AI receptionist assistant.",
   },
 ];
 
+const BENEFITS = [
+  { icon: "🔗", title: "Seamless CRM Integration", desc: "Pushes data directly to Follow Up Boss, Salesforce, and HubSpot." },
+  { icon: "📱", title: "Mobile Intake Forms", desc: "Clean, mobile-first lead forms that convert at 2x the industry average." },
+  { icon: "📅", title: "Automatic Calendar Booking", desc: "Leads book directly onto your agent's calendars post-qualification." },
+];
+
+const PRICING_PLANS = [
+  { name: "Starter", price: "Free", period: "", desc: "For solo agents just getting started.", features: ["50 leads/month", "AI qualification", "Basic analytics", "Email support"], cta: "Get Started", highlight: false },
+  { name: "Professional", price: "$49", period: "/mo", desc: "For growing teams that need more power.", features: ["Unlimited leads", "CRM integrations", "Auto-tagging & scoring", "Priority support", "Team management"], cta: "Start Free Trial", highlight: true },
+  { name: "Enterprise", price: "Custom", period: "", desc: "For brokerages with advanced needs.", features: ["Everything in Pro", "Custom AI training", "Dedicated account manager", "SLA guarantees", "White-label options"], cta: "Contact Sales", highlight: false },
+];
+
+const RESOURCES = [
+  { icon: "📖", title: "Documentation", desc: "Explore the full RealtyOS platform architecture and API reference.", link: "/docs" },
+  { icon: "🎓", title: "Getting Started Guide", desc: "A step-by-step walkthrough for new agents setting up their first pipeline.", link: "/getting-started" },
+  { icon: "💬", title: "Community Forum", desc: "Connect with other real estate professionals using RealtyOS.", link: "/community" },
+  { icon: "📹", title: "Video Tutorials", desc: "Watch short demos of key features like lead qualification and booking.", link: "/tutorials" },
+];
+
 export function PublicLanding() {
+  // Smooth scroll for all anchor links
+  useEffect(() => {
+    function handleAnchorClick(e: MouseEvent) {
+      const target = (e.target as HTMLElement).closest('a[href^="#"]');
+      if (!target) return;
+      e.preventDefault();
+      const id = (target as HTMLAnchorElement).getAttribute('href')!.slice(1);
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    document.addEventListener('click', handleAnchorClick);
+    return () => document.removeEventListener('click', handleAnchorClick);
+  }, []);
+
+  // Counting stats
+  const stat1 = useCountUp(40, "%");
+  const stat2 = useCountUp(3, "s");
+  const stat3 = useCountUp(10, "k+");
+  const statRefs = [stat1, stat2, stat3];
+
+  // Section reveal refs
+  const featuresRef = useReveal();
+  const solutionsRef = useReveal();
+  const pricingRef = useReveal();
+  const resourcesRef = useReveal();
+  const ctaRef = useReveal();
   return (
-    <main className="lp-shell">
+    <main className="lp-shell" style={{ background: "#FFFFFF", color: "#1E293B" }}>
       {/* ── Header ── */}
-      <header className="lp-header">
-        <Link className="lp-logo" href="/">
-          <span className="lp-logo-mark">
-            <span />
-            <span />
-            <span />
+      <header className="b2b-header">
+        <Link className="b2b-logo" href="/">
+          <span className="b2b-logo-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1" fill="#F25C05"/><rect x="14" y="3" width="7" height="5" rx="1" fill="#F25C05"/><rect x="14" y="12" width="7" height="9" rx="1" fill="#F25C05"/><rect x="3" y="16" width="7" height="5" rx="1" fill="#F25C05"/></svg>
           </span>
           <strong>RealtyOS</strong>
         </Link>
-
-        <nav className="lp-nav">
-          <a href="#features">Buy</a>
-          <a href="#listings">Rent</a>
-          <a href="#features">Sell</a>
-          <a href="#features">Agents</a>
+        <nav className="b2b-nav">
+          <a href="#features">Features</a>
+          <a href="#solutions">Solutions</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#resources">Resources</a>
         </nav>
-
-        <div className="lp-header-actions">
-          <Link className="lp-btn-primary-sm" href="/inquiry">
-            Sign Up
-          </Link>
-          <Link className="lp-btn-outline-sm" href="/portal/login">
-            Log In
-          </Link>
-          <ThemeToggle className="lp-theme-toggle" />
+        <div className="b2b-header-actions">
+          <Link className="b2b-btn-ghost" href="/admin/login">Login</Link>
+          <Link className="b2b-btn-primary" href="/admin/register">Get Started</Link>
         </div>
       </header>
 
       {/* ── Hero ── */}
-      <section className="lp-hero">
-        <Image
-          src="/hero-bg.png"
-          alt="Luxury home at sunset"
-          fill
-          priority
-          className="lp-hero-img"
-        />
-        <div className="lp-hero-overlay" />
-        <div className="lp-hero-content">
-          <h1>Find Your Dream Home</h1>
-          <p>
-            Experience the future of real estate with RealtyOS. AI-driven speed
-            meets hyper-personalized curation for buyers and renters.
-          </p>
-
-          <div className="lp-search-bar">
-            <span className="lp-search-icon">🔍</span>
-            <input
-              type="text"
-              placeholder="Enter neighborhood, city, or zip code"
-              className="lp-search-input"
-            />
-            <Link href="/inquiry" className="lp-search-btn">
-              Search Now →
+      <section className="b2b-hero">
+        <div className="b2b-hero-left">
+          <span className="b2b-kicker">Now Powered By Advanced AI</span>
+          <h1>Zero-Latency<br />Lead<br />Engagement.</h1>
+          <p>Qualify, tag, and book appointments without human intervention. RealtyOS bridges the gap between lead generation and closed deals.</p>
+          <div className="b2b-hero-cta">
+            <Link href="/admin/register" className="b2b-btn-primary-lg">Get Started for Free →</Link>
+            <Link href={"/demo" as any} className="b2b-btn-outline-lg">
+              <span className="b2b-play-icon">▶</span> Watch Demo
             </Link>
           </div>
-
-          <div className="lp-trust-row">
-            <span>✓ 10k+ Users</span>
-            <span>✓ AI-Backed</span>
-            <span>✓ Smart Matching</span>
+        </div>
+        <div className="b2b-hero-right">
+          <div className="b2b-hero-screenshot">
+            <Image src="/hero-bg.png" alt="RealtyOS Dashboard Preview" width={540} height={360} priority
+              style={{ borderRadius: "12px", objectFit: "cover", width: "100%", height: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }} />
           </div>
         </div>
+      </section>
+
+      {/* ── Stats Bar ── */}
+      <section className="b2b-stats">
+        {STATS.map((s, i) => (
+          <div key={s.label} className="b2b-stat-item">
+            <strong ref={i < 3 ? statRefs[i].ref as any : undefined}>{i < 3 ? statRefs[i].display : s.value}</strong>
+            <span className="b2b-stat-label">{s.label}</span>
+            <span className="b2b-stat-sub">{s.sub}</span>
+          </div>
+        ))}
       </section>
 
       {/* ── Features ── */}
-      <section className="lp-features" id="features">
-        <div className="lp-features-head">
-          <div>
-            <span className="marketing-kicker">The RealtyOS advantage</span>
-            <h2>
-              Why choose us for your
-              <br />
-              property search?
-            </h2>
-          </div>
-          <p>
-            We&apos;ve re-engineered the real estate experience from the ground
-            up using advanced machine learning.
-          </p>
+      <section className="b2b-features" id="features" ref={featuresRef as any}>
+        <div className="b2b-section-header">
+          <span className="b2b-kicker">POWERFUL FEATURES</span>
+          <h2>Real-Time Intelligence for<br />Modern Real Estate</h2>
+          <p>Our AI-driven engine handles the heavy-lifting of lead qualification so your team can focus on closing deals.</p>
         </div>
-
-        <div className="lp-features-grid">
-          <article className="lp-feature-card">
-            <div className="lp-feature-icon">⚡</div>
-            <h3>AI-Driven Speed</h3>
-            <p>
-              Our proprietary algorithm scans thousands of market and MLS
-              listings in milliseconds to find matches before they hit
-              mainstream sites.
-            </p>
-          </article>
-          <article className="lp-feature-card">
-            <div className="lp-feature-icon">♥</div>
-            <h3>Personalized Curation</h3>
-            <p>
-              Receive a hand-picked daily selection of properties that actually
-              fit your lifestyle and financial goals.
-            </p>
-          </article>
-          <article className="lp-feature-card">
-            <div className="lp-feature-icon">📊</div>
-            <h3>Real-Time Insights</h3>
-            <p>
-              Access deep neighborhood data, school ratings, and predictive
-              value trends to make informed investment decisions.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      {/* ── Listings ── */}
-      <section className="lp-listings" id="listings">
-        <div className="lp-listings-head">
-          <h2>Newest Listings</h2>
-          <Link href="/inquiry" className="lp-view-all">
-            View All →
-          </Link>
-        </div>
-
-        <div className="lp-listings-grid">
-          {LISTINGS.map((l) => (
-            <article key={l.name} className="lp-listing-card">
-              <div className="lp-listing-img-wrap">
-                <Image
-                  src={l.img}
-                  alt={l.name}
-                  fill
-                  className="lp-listing-img"
-                />
-                <span className="lp-listing-badge">{l.badge}</span>
-                <button className="lp-listing-fav" aria-label="Favorite">
-                  ♡
-                </button>
-              </div>
-              <div className="lp-listing-info">
-                <strong className="lp-listing-price">{l.price}</strong>
-                <h4>{l.name}</h4>
-                <p>{l.location}</p>
-                <div className="lp-listing-meta">
-                  <span>🛏 {l.beds} Beds</span>
-                  <span>🚿 {l.baths} Baths</span>
-                  <span>📐 {l.sqft} sqft</span>
-                </div>
-              </div>
+        <div className="b2b-features-grid">
+          {FEATURES.map((f) => (
+            <article key={f.title} className="b2b-feature-card">
+              <div className="b2b-feature-icon">{f.icon}</div>
+              <h3>{f.title}</h3>
+              <p>{f.desc}</p>
             </article>
           ))}
         </div>
       </section>
 
-      {/* ── CTA ── */}
-      <section className="lp-cta">
-        <div className="lp-cta-content">
-          <h2>
-            Ready to find your
-            <br />
-            forever home?
-          </h2>
-          <p>
-            Take our 2-minute lifestyle quiz and let RealtyOS find properties
-            that match your soul, not just your filters.
-          </p>
-          <Link href="/inquiry" className="lp-btn-primary-lg">
-            Find My Dream Home
-          </Link>
+      {/* ── Solutions / Benefits ── */}
+      <section className="b2b-solutions" id="solutions" ref={solutionsRef as any}>
+        <div className="b2b-solutions-content">
+          <div className="b2b-solutions-text">
+            <h2>Designed for high-growth real estate teams</h2>
+            <div className="b2b-benefits-list">
+              {BENEFITS.map((b) => (
+                <div key={b.title} className="b2b-benefit-item">
+                  <span className="b2b-benefit-icon">{b.icon}</span>
+                  <div>
+                    <h4>{b.title}</h4>
+                    <p>{b.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="b2b-solutions-img">
+            <div className="b2b-phone-mockup">
+              <Image src="/property-1.png" alt="Mobile Intake Form Preview" width={320} height={500}
+                style={{ borderRadius: "24px", objectFit: "cover", width: "100%", height: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.12)" }} />
+            </div>
+          </div>
         </div>
-        <div className="lp-cta-images">
-          <Image
-            src="/property-1.png"
-            alt="Property preview"
-            width={200}
-            height={150}
-            className="lp-cta-img"
-          />
-          <Image
-            src="/property-4.png"
-            alt="Property preview"
-            width={200}
-            height={150}
-            className="lp-cta-img"
-          />
+      </section>
+
+      {/* ── Pricing ── */}
+      <section className="b2b-pricing" id="pricing" ref={pricingRef as any}>
+        <div className="b2b-section-header">
+          <span className="b2b-kicker">SIMPLE PRICING</span>
+          <h2>Plans that scale with your business</h2>
+          <p>Start free. Upgrade when you need more power. No hidden fees.</p>
+        </div>
+        <div className="b2b-pricing-grid">
+          {PRICING_PLANS.map((plan) => (
+            <div key={plan.name} className={`b2b-pricing-card ${plan.highlight ? "b2b-pricing-highlight" : ""}`}>
+              <h3>{plan.name}</h3>
+              <div className="b2b-pricing-price">
+                <strong>{plan.price}</strong>{plan.period && <span>{plan.period}</span>}
+              </div>
+              <p className="b2b-pricing-desc">{plan.desc}</p>
+              <ul className="b2b-pricing-features">
+                {plan.features.map((f) => (<li key={f}>✓ {f}</li>))}
+              </ul>
+              <Link href="/admin/register" className={plan.highlight ? "b2b-btn-primary-lg" : "b2b-btn-outline-lg"} style={{ width: "100%", justifyContent: "center", textDecoration: "none" }}>
+                {plan.cta}
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Resources ── */}
+      <section className="b2b-resources" id="resources" ref={resourcesRef as any}>
+        <div className="b2b-section-header">
+          <span className="b2b-kicker">RESOURCES</span>
+          <h2>Everything you need to succeed</h2>
+          <p>Guides, documentation, and community support to help you get the most out of RealtyOS.</p>
+        </div>
+        <div className="b2b-resources-grid">
+          {RESOURCES.map((r) => (
+            <Link key={r.title} href={r.link as any} className="b2b-resource-card">
+              <span className="b2b-resource-icon">{r.icon}</span>
+              <h4>{r.title}</h4>
+              <p>{r.desc}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ── CTA Banner ── */}
+      <section className="b2b-cta" ref={ctaRef as any}>
+        <div className="b2b-cta-inner">
+          <div className="b2b-cta-text">
+            <h2>Ready to stop losing leads?</h2>
+            <p>Join 500+ top-producing teams automating their lead qualification today.</p>
+          </div>
+          <div className="b2b-cta-actions">
+            <Link href="/admin/register" className="b2b-cta-btn-primary">Start Free Trial</Link>
+            <Link href={"/demo" as any} className="b2b-cta-btn-outline">Book a Demo</Link>
+          </div>
         </div>
       </section>
 
       {/* ── Footer ── */}
-      <footer className="lp-footer">
-        <div className="lp-footer-grid">
-          <div className="lp-footer-brand">
-            <span className="lp-logo-mark lp-logo-mark-sm">
-              <span />
-              <span />
-              <span />
-            </span>
-            <strong>RealtyOS</strong>
-            <p>
-              Redefining the property search experience with AI-powered
-              intelligence and human-centric design.
-            </p>
-          </div>
-
-          <div className="lp-footer-col">
-            <h5>Company</h5>
-            <a href="#">About Us</a>
-            <a href="#">Our Team</a>
-            <a href="#">Careers</a>
-            <a href="#">Contact</a>
-          </div>
-
-          <div className="lp-footer-col">
-            <h5>Resources</h5>
-            <a href="#">Buyer&apos;s Guide</a>
-            <a href="#">Seller&apos;s Guide</a>
-            <a href="#">Market Trends</a>
-            <a href="#">Mortgage Calculator</a>
-          </div>
-
-          <div className="lp-footer-col">
-            <h5>Newsletter</h5>
-            <p>Get the latest market insights delivered to your inbox.</p>
-            <div className="lp-newsletter">
-              <input type="email" placeholder="Email address" />
-              <button className="lp-newsletter-btn" aria-label="Subscribe">
-                →
-              </button>
+      <footer className="b2b-footer">
+        <div className="b2b-footer-grid">
+          <div className="b2b-footer-brand">
+            <div className="b2b-footer-logo">
+              <span className="b2b-logo-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1" fill="#F25C05"/><rect x="14" y="3" width="7" height="5" rx="1" fill="#F25C05"/><rect x="14" y="12" width="7" height="9" rx="1" fill="#F25C05"/><rect x="3" y="16" width="7" height="5" rx="1" fill="#F25C05"/></svg>
+              </span>
+              <strong>RealtyOS</strong>
             </div>
+            <p>The intelligent layer for real estate professionals. Scale your business without scaling your overhead.</p>
+            <div className="b2b-social-links">
+              <a href="#" aria-label="Instagram">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              </a>
+              <a href="#" aria-label="Twitter">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <div className="b2b-footer-col">
+            <h5>Product</h5>
+            <Link href={"/automations" as any}>Automations</Link>
+            <a href="#features">Lead Scoring</a>
+            <a href="#features">Integrations</a>
+            <a href="#pricing">Pricing</a>
+          </div>
+
+          <div className="b2b-footer-col">
+            <h5>Company</h5>
+            <Link href={"/about" as any}>About Us</Link>
+            <Link href={"/careers" as any}>Careers</Link>
+            <Link href={"/privacy" as any}>Privacy Policy</Link>
+            <Link href={"/terms" as any}>Terms of Service</Link>
+          </div>
+
+          <div className="b2b-footer-col">
+            <h5>Support</h5>
+            <Link href={"/help" as any}>Help Center</Link>
+            <Link href="/docs">API Docs</Link>
+            <Link href={"/contact" as any}>Contact</Link>
           </div>
         </div>
 
-        <div className="lp-footer-bottom">
-          <span>
-            &copy; {new Date().getFullYear()} RealtyOS. All rights reserved.
-          </span>
-          <div className="lp-footer-legal">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Cookie Settings</a>
-          </div>
+        <div className="b2b-footer-bottom">
+          <span>&copy; {new Date().getFullYear()} RealtyOS, Inc. All rights reserved.</span>
         </div>
       </footer>
     </main>

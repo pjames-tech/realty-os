@@ -1,5 +1,6 @@
 import { AdminShell } from "@/components/admin-shell";
 import { ThemeSettings } from "@/components/theme-settings";
+import { TeamManagement } from "@/components/team-management";
 
 export default function AdminSettingsPage() {
   return (
@@ -8,6 +9,7 @@ export default function AdminSettingsPage() {
       description="Configure dashboard preferences and interface behavior."
     >
       <ThemeSettings />
+      <TeamManagement />
     </AdminShell>
   );
 }

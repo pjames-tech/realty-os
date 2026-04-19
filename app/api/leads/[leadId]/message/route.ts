@@ -4,71 +4,85 @@ import { applyQualificationUpdates, deriveTags } from "@/lib/domain";
 import { qualifyLeadMessage } from "@/lib/qualifier";
 import {
   appendConversation,
-  mutateState,
-  trackResponseMetrics
-} from "@/lib/store";
-import { LeadMessagePayload } from "@/lib/types";
+  getLeadById,
+  persistLeadFromDomain,
+  trackResponseMetrics,
+} from "@/lib/db-helpers";
+import { prismaLeadToLeadRecord } from "@/lib/db-mappers";
+import { messageSchema } from "@/lib/validations";
 
 export const runtime = "nodejs";
 
 type Context = {
-  params: { leadId: string };
+  params: Promise<{ leadId: string }>;
 };
 
 export async function POST(req: NextRequest, context: Context) {
-  let payload: LeadMessagePayload;
+  let payload: unknown;
   try {
-    payload = (await req.json()) as LeadMessagePayload;
+    payload = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
-  if (!payload.message || payload.message.trim().length === 0) {
+  const parsed = messageSchema.safeParse(payload);
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: "message is required" },
+      { error: parsed.error.issues[0].message },
       { status: 400 }
     );
   }
 
-  const { leadId } = context.params;
+  const { leadId } = await context.params;
+  const { message } = parsed.data;
   const startTime = Date.now();
 
-  const result = await mutateState(async (state) => {
-    const existing = state.leads[leadId];
-    if (!existing) {
-      return null;
-    }
-
-    let lead = appendConversation(existing, "user", payload.message.trim());
-    const decision = await qualifyLeadMessage(lead, payload.message.trim());
-    lead = applyQualificationUpdates(
-      lead,
-      decision.updates,
-      decision.confidence,
-      decision.action
-    );
-
-    if (decision.action === "book") {
-      lead = markLeadBooked(lead);
-    }
-
-    lead = appendConversation(lead, "assistant", decision.reply);
-    lead.tags = deriveTags(lead);
-    state.leads[lead.id] = lead;
-
-    const responseTimeMs = Date.now() - startTime;
-    trackResponseMetrics(state, responseTimeMs);
-
-    return {
-      lead,
-      assistantReply: decision.reply,
-      responseTimeMs
-    };
-  });
-
-  if (!result) {
+  const prismaLead = await getLeadById(leadId);
+  if (!prismaLead) {
     return NextResponse.json({ error: "Lead not found" }, { status: 404 });
   }
 
-  return NextResponse.json(result);
+  // Append user message
+  await appendConversation(leadId, "user", message.trim());
+
+  // Convert to domain type for qualifier
+  let leadRecord = prismaLeadToLeadRecord(prismaLead);
+  // Add the message we just appended to the in-memory record
+  leadRecord.conversation = [
+    ...leadRecord.conversation,
+    { id: "temp", role: "user", content: message.trim(), timestamp: new Date().toISOString() },
+  ];
+
+  // Run AI qualifier (outside transaction)
+  const decision = await qualifyLeadMessage(leadRecord, message.trim());
+
+  // Apply domain logic
+  leadRecord = applyQualificationUpdates(
+    leadRecord,
+    decision.updates,
+    decision.confidence,
+    decision.action
+  );
+
+  if (decision.action === "book") {
+    leadRecord = markLeadBooked(leadRecord);
+  }
+
+  leadRecord.tags = deriveTags(leadRecord);
+
+  // Persist assistant reply
+  await appendConversation(leadId, "assistant", decision.reply);
+
+  // Persist domain updates
+  await persistLeadFromDomain({ ...leadRecord, id: leadId });
+
+  // Track metrics
+  const responseTimeMs = Date.now() - startTime;
+  await trackResponseMetrics(responseTimeMs);
+
+  return NextResponse.json({
+    lead: leadRecord,
+    assistantReply: decision.reply,
+    responseTimeMs,
+  });
 }

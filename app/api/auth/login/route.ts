@@ -1,36 +1,54 @@
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import {
-  ADMIN_SESSION_COOKIE,
-  getAdminSessionToken,
-  validateAdminCredentials
-} from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { loginSchema } from "@/lib/validations";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
-  let payload: { email?: string; password?: string };
-
+  let payload: unknown;
   try {
-    payload = (await request.json()) as { email?: string; password?: string };
+    payload = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
-  const email = payload.email?.trim() || "";
-  const password = payload.password?.trim() || "";
+  const parsed = loginSchema.safeParse(payload);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0].message },
+      { status: 400 }
+    );
+  }
 
-  if (!validateAdminCredentials(email, password)) {
+  const { email, password } = parsed.data;
+
+  // Sign in via Supabase Auth
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error || !data.user) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  (await cookies()).set(ADMIN_SESSION_COOKIE, getAdminSessionToken(), {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 8
+  // Look up the agent record linked to this Supabase user
+  const agent = await db.agent.findUnique({
+    where: { supabaseUserId: data.user.id },
   });
 
-  return NextResponse.json({ ok: true });
+  if (!agent) {
+    // Valid Supabase user but no agent record — sign them out
+    await supabase.auth.signOut();
+    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    name: agent.name,
+    role: agent.role,
+    email: agent.email,
+  });
 }

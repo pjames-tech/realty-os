@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter } from "next/font/google";
 import { PublicAssistantLayer } from "@/components/public-assistant-layer";
 import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-body",
-  display: "swap"
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-display",
   display: "swap"
 });
 
@@ -43,7 +37,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} ${spaceGrotesk.variable}`}>
+      <body className={inter.variable} suppressHydrationWarning>
         {children}
         <PublicAssistantLayer />
       </body>

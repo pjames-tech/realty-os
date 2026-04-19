@@ -1,90 +1,102 @@
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { CLIENT_SESSION_COOKIE } from "@/lib/auth";
 import { applyQualificationUpdates, deriveTags } from "@/lib/domain";
 import { qualifyLeadMessage } from "@/lib/qualifier";
 import {
-  appendConversation,
   createLead,
-  mutateState,
+  appendConversation,
+  persistLeadFromDomain,
   trackResponseMetrics,
-} from "@/lib/store";
+} from "@/lib/db-helpers";
+import { prismaLeadToLeadRecord } from "@/lib/db-mappers";
+import { setClientSession } from "@/lib/auth-config";
+import { clientSignupSchema } from "@/lib/validations";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  let payload: {
-    name?: string;
-    email?: string;
-    phone?: string;
-    budget?: string;
-    location?: string;
-    propertyType?: string;
-    timeline?: string;
-  };
-
+  let payload: unknown;
   try {
     payload = await req.json();
   } catch {
+    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+  }
+
+  const parsed = clientSignupSchema.safeParse(payload);
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: "Invalid JSON payload" },
+      { error: parsed.error.issues[0].message },
       { status: 400 }
     );
   }
 
-  if (!payload.email?.trim()) {
-    return NextResponse.json(
-      { error: "Email is required" },
-      { status: 400 }
-    );
-  }
+  const { name, email, phone, password, budget, location, propertyType, timeline, agentId } =
+    parsed.data;
 
   const startTime = Date.now();
 
+  // Build the initial message from form fields
   const message = [
-    payload.name ? `My name is ${payload.name}.` : "",
-    payload.budget ? `My budget is ${payload.budget}.` : "",
-    payload.location ? `Preferred location is ${payload.location}.` : "",
-    payload.propertyType ? `Property type is ${payload.propertyType}.` : "",
-    payload.timeline ? `My timeline is ${payload.timeline}.` : "",
+    name ? `My name is ${name}.` : "",
+    budget ? `My budget is ${budget}.` : "",
+    location ? `Preferred location is ${location}.` : "",
+    propertyType ? `Property type is ${propertyType}.` : "",
+    timeline ? `My timeline is ${timeline}.` : "",
   ]
     .filter(Boolean)
     .join(" ");
 
-  const result = await mutateState(async (state) => {
-    let lead = createLead({
-      name: payload.name,
-      email: payload.email,
+  try {
+    // Create the lead in the database with hashed password
+    const prismaLead = await createLead({
+      name,
+      email,
+      phone,
       source: "website-onboarding",
+      password,
+      agentId,
     });
 
-    lead = appendConversation(lead, "user", message);
+    // Append the user's message
+    await appendConversation(prismaLead.id, "user", message);
 
-    const decision = await qualifyLeadMessage(lead, message);
-    lead = applyQualificationUpdates(
-      lead,
+    // Run the AI qualifier (outside transaction — external API call)
+    let leadRecord = prismaLeadToLeadRecord(prismaLead);
+    // Add the user message to the in-memory record for the qualifier
+    leadRecord.conversation = [
+      ...leadRecord.conversation,
+      { id: "temp", role: "user", content: message, timestamp: new Date().toISOString() },
+    ];
+
+    const decision = await qualifyLeadMessage(leadRecord, message);
+
+    // Apply domain logic
+    leadRecord = applyQualificationUpdates(
+      leadRecord,
       decision.updates,
       decision.confidence,
       decision.action
     );
-    lead = appendConversation(lead, "assistant", decision.reply);
-    lead.tags = deriveTags(lead);
+    leadRecord.tags = deriveTags(leadRecord);
 
-    state.leads[lead.id] = lead;
+    // Persist the assistant's reply
+    await appendConversation(prismaLead.id, "assistant", decision.reply);
+
+    // Persist domain updates back to DB
+    await persistLeadFromDomain({ ...leadRecord, id: prismaLead.id });
+
+    // Track metrics
     const responseTimeMs = Date.now() - startTime;
-    trackResponseMetrics(state, responseTimeMs);
+    await trackResponseMetrics(responseTimeMs);
 
-    return { leadId: lead.id, assistantReply: decision.reply };
-  });
+    // Set client session cookie
+    await setClientSession(prismaLead.id);
 
-  // Set session cookie so user is auto-logged in
-  (await cookies()).set(CLIENT_SESSION_COOKIE, result.leadId, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 8,
-  });
-
-  return NextResponse.json({ ok: true, ...result }, { status: 201 });
+    return NextResponse.json(
+      { ok: true, leadId: prismaLead.id, assistantReply: decision.reply },
+      { status: 201 }
+    );
+  } catch (error: unknown) {
+    const message2 = error instanceof Error ? error.message : "Signup failed";
+    return NextResponse.json({ error: message2 }, { status: 500 });
+  }
 }

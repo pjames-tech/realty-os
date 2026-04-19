@@ -1,0 +1,279 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum AgentRole {
+  SUPER_ADMIN
+  ORG_ADMIN
+  ORG_AGENT
+  SOLO_AGENT
+}
+
+enum LeadStatus {
+  new_lead      @map("new")
+  qualifying
+  qualified
+  booked
+  disqualified
+}
+
+enum ConversationRole {
+  user
+  assistant
+}
+
+enum MessageSender {
+  client
+  agent
+}
+
+enum PropertyStatus {
+  active
+  pending
+  sold
+  off_market
+}
+
+enum PropertyType {
+  single_family
+  condo
+  townhouse
+  apartment
+  multi_family
+  land
+}
+
+enum TourType {
+  in_person
+  virtual
+}
+
+enum TourStatus {
+  scheduled
+  completed
+  cancelled
+}
+
+// ─── Agent (admin / broker / agent users) ────────────────
+
+model Agent {
+  id               String    @id @default(cuid())
+  supabaseUserId   String?   @unique
+  name             String
+  email            String    @unique
+  passwordHash     String
+  role             AgentRole
+  organizationName String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  leads       Lead[]
+  invitations Invitation[]
+  listings    Property[]
+
+  @@map("agents")
+}
+
+// ─── Lead (prospect / client) ────────────────────────────
+
+model Lead {
+  id           String     @id @default(cuid())
+  name         String?
+  email        String?
+  phone        String?
+  password     String?
+  source       String     @default("website-form")
+  status       LeadStatus @default(new_lead)
+  avatar       String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  agentId String?
+  agent   Agent?  @relation(fields: [agentId], references: [id])
+
+  qualification   Qualification?
+  appointment     Appointment?
+  conversations   ConversationMessage[]
+  agentMessages   AgentMessage[]
+  tags            LeadTag[]
+  savedProperties SavedProperty[]
+  tours           Tour[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([agentId])
+  @@index([status])
+  @@map("leads")
+}
+
+// ─── Qualification (1:1 with Lead) ───────────────────────
+
+model Qualification {
+  id            String   @id @default(cuid())
+  leadId        String   @unique
+  lead          Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  budget        String?
+  timeline      String?
+  location      String?
+  propertyType  String?
+  confidence    Float    @default(0)
+  missingFields String[] @default(["budget", "timeline", "location", "propertyType"])
+
+  @@map("qualifications")
+}
+
+// ─── Conversation messages (AI qualification thread) ─────
+
+model ConversationMessage {
+  id        String           @id @default(cuid())
+  leadId    String
+  lead      Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  role      ConversationRole
+  content   String
+  timestamp DateTime         @default(now())
+
+  @@index([leadId])
+  @@map("conversation_messages")
+}
+
+// ─── Agent messages (agent <-> client thread) ────────────
+
+model AgentMessage {
+  id        String        @id @default(cuid())
+  leadId    String
+  lead      Lead          @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  sender    MessageSender
+  content   String
+  timestamp DateTime      @default(now())
+
+  @@index([leadId])
+  @@map("agent_messages")
+}
+
+// ─── Appointment (1:1 with Lead) ─────────────────────────
+
+model Appointment {
+  id           String   @id @default(cuid())
+  leadId       String   @unique
+  lead         Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  slot         String
+  calendarLink String
+  bookedAt     DateTime @default(now())
+
+  @@map("appointments")
+}
+
+// ─── Lead tags (normalized for filtering) ────────────────
+
+model LeadTag {
+  id     String @id @default(cuid())
+  leadId String
+  lead   Lead   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  tag    String
+
+  @@unique([leadId, tag])
+  @@index([tag])
+  @@map("lead_tags")
+}
+
+// ─── Invitation (agent invite tokens) ────────────────────
+
+model Invitation {
+  id               String    @id @default(cuid())
+  token            String    @unique
+  email            String
+  organizationName String
+  invitedById      String?
+  invitedBy        Agent?    @relation(fields: [invitedById], references: [id])
+  createdAt        DateTime  @default(now())
+  usedAt           DateTime?
+
+  @@map("invitations")
+}
+
+// ─── Property (real estate listings) ─────────────────────
+
+model Property {
+  id          String         @id @default(cuid())
+  title       String
+  description String?
+  price       Int
+  beds        Int
+  baths       Float
+  sqft        Int?
+  type        PropertyType
+  status      PropertyStatus @default(active)
+  address     String
+  city        String
+  state       String
+  zip         String
+  images      String[]       @default([])
+  features    String[]       @default([])
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  agentId String
+  agent   Agent  @relation(fields: [agentId], references: [id])
+
+  savedBy SavedProperty[]
+  tours   Tour[]
+
+  @@index([agentId])
+  @@index([status])
+  @@index([city])
+  @@index([price])
+  @@map("properties")
+}
+
+// ─── Saved properties (client favorites) ─────────────────
+
+model SavedProperty {
+  id         String   @id @default(cuid())
+  leadId     String
+  propertyId String
+  lead       Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  savedAt    DateTime @default(now())
+
+  @@unique([leadId, propertyId])
+  @@index([leadId])
+  @@map("saved_properties")
+}
+
+// ─── Tour (scheduled property viewing) ───────────────────
+
+model Tour {
+  id          String     @id @default(cuid())
+  leadId      String
+  propertyId  String
+  lead        Lead       @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  property    Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  scheduledAt DateTime
+  type        TourType
+  status      TourStatus @default(scheduled)
+  notes       String?
+  createdAt   DateTime   @default(now())
+
+  @@index([leadId])
+  @@index([propertyId])
+  @@index([scheduledAt])
+  @@map("tours")
+}
+
+// ─── Metrics (singleton row) ─────────────────────────────
+
+model Metrics {
+  id                  String @id @default("global")
+  processedMessages   Int    @default(0)
+  totalResponseTimeMs Float  @default(0)
+  maxResponseTimeMs   Float  @default(0)
+  underThreeSeconds   Int    @default(0)
+
+  @@map("metrics")
+}

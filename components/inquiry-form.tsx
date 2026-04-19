@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const TOTAL_STEPS = 6;
 const budgetOptions = ["Under $500k", "$500k - $1M", "$1M - $3M", "Above $3M"];
@@ -15,10 +15,22 @@ const propertyOptions = [
 const timelineOptions = ["ASAP", "1-3 Months", "3-6 Months", "Just Browsing"];
 
 export function InquiryForm() {
+  return (
+    <Suspense fallback={<div className="inquiry-shell" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>Loading...</div>}>
+      <InquiryFormInner />
+    </Suspense>
+  );
+}
+
+function InquiryFormInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const agentId = searchParams.get("agent");
+
   const [step, setStep] = useState(1);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [budget, setBudget] = useState("");
   const [location, setLocation] = useState("");
   const [propertyType, setPropertyType] = useState("");
@@ -29,7 +41,7 @@ export function InquiryForm() {
   function canAdvance(): boolean {
     switch (step) {
       case 1: return true; // welcome
-      case 2: return fullName.trim().length > 0 && email.trim().length > 0;
+      case 2: return fullName.trim().length > 0 && email.trim().length > 0 && password.length >= 8;
       case 3: return budget.length > 0;
       case 4: return location.trim().length > 0;
       case 5: return propertyType.length > 0;
@@ -54,10 +66,12 @@ export function InquiryForm() {
         body: JSON.stringify({
           name: fullName,
           email,
+          password,
           budget,
           location,
           propertyType,
           timeline,
+          agentId
         }),
       });
 
@@ -140,6 +154,16 @@ export function InquiryForm() {
                   placeholder="alex@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                />
+              </label>
+              <label className="inquiry-label">
+                <span>Create a Password</span>
+                <input
+                  type="password"
+                  placeholder="At least 8 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
                 />
               </label>
             </>

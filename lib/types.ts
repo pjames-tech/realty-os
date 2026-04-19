@@ -14,6 +14,13 @@ export interface ConversationMessage {
   timestamp: string;
 }
 
+export interface AgentMessage {
+  id: string;
+  sender: "client" | "agent";
+  content: string;
+  timestamp: string;
+}
+
 export interface QualificationState {
   budget?: string;
   timeline?: string;
@@ -43,6 +50,10 @@ export interface LeadRecord {
   qualification: QualificationState;
   conversation: ConversationMessage[];
   appointment?: Appointment;
+  avatar?: string;
+  agentMessages?: AgentMessage[];
+  agentName?: string;
+  agentEmail?: string;
 }
 
 export interface Metrics {
@@ -52,9 +63,28 @@ export interface Metrics {
   underThreeSeconds: number;
 }
 
+export interface AgentAccount {
+  id: string;
+  name: string;
+  email: string;
+  passwordHash?: string; // Simplistic mock storage
+  role: "SUPER_ADMIN" | "ORG_ADMIN" | "ORG_AGENT" | "SOLO_AGENT";
+  organizationName?: string;
+  createdAt: string;
+}
+
+export interface AgentInvite {
+  token: string;
+  email: string;
+  organizationName: string;
+  createdAt: string;
+}
+
 export interface RealtyState {
   leads: Record<string, LeadRecord>;
   metrics: Metrics;
+  agents: Record<string, AgentAccount>;
+  invitations: Record<string, AgentInvite>;
 }
 
 export interface IngestPayload {
@@ -63,6 +93,7 @@ export interface IngestPayload {
   phone?: string;
   source?: string;
   message: string;
+  agentId?: string;
 }
 
 export interface LeadMessagePayload {

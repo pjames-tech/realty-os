@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 
 export function ClientLogin() {
   const router = useRouter();
-  const [identifier, setIdentifier] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -19,7 +20,7 @@ export function ClientLogin() {
       const response = await fetch("/api/client/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier })
+        body: JSON.stringify({ email, password }),
       });
 
       const payload = await response.json();
@@ -43,16 +44,25 @@ export function ClientLogin() {
           <span className="section-kicker">Client access</span>
           <h1>Check your lead status and booking link.</h1>
           <p>
-            Enter the email address or phone number you used when you submitted
+            Sign in with the email address and password you used when you submitted
             your property request.
           </p>
         </div>
 
         <form className="login-form" onSubmit={handleSubmit}>
           <input
-            placeholder="Email or phone"
-            value={identifier}
-            onChange={(event) => setIdentifier(event.target.value)}
+            autoComplete="email"
+            placeholder="Email address"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+          <input
+            autoComplete="current-password"
+            placeholder="Password"
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
           />
           <button className="header-button" disabled={submitting} type="submit">
             {submitting ? "Opening..." : "Open client portal"}

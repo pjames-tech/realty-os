@@ -1,9 +1,10 @@
 import { AdminLogin } from "@/components/admin-login";
 
-export default function AdminLoginPage({
+export default async function AdminLoginPage({
   searchParams
 }: {
-  searchParams?: { next?: string };
+  searchParams: Promise<{ next?: string }>;
 }) {
-  return <AdminLogin nextUrl={searchParams?.next || "/admin"} />;
+  const params = await searchParams;
+  return <AdminLogin nextUrl={params?.next || "/admin"} />;
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export function AdminLogin({ nextUrl = "/admin" }: { nextUrl?: string }) {
   const router = useRouter();
@@ -18,15 +19,28 @@ export function AdminLogin({ nextUrl = "/admin" }: { nextUrl?: string }) {
     setError("");
 
     try {
+      // Sign in via Supabase Auth (sets auth cookies automatically)
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        throw new Error(authError.message || "Invalid credentials");
+      }
+
+      // Fetch agent details from our API
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+      if (response.ok && data.name) {
+        localStorage.setItem("realtyos-admin-name", data.name);
+        localStorage.setItem("realtyos-admin-role", data.role);
       }
 
       router.push(nextUrl as Route);
@@ -42,18 +56,17 @@ export function AdminLogin({ nextUrl = "/admin" }: { nextUrl?: string }) {
     <main className="login-shell">
       <section className="login-panel">
         <div className="login-copy">
-          <span className="section-kicker">Admin login</span>
-          <h1>Access the RealtyOS operations dashboard.</h1>
+          <span className="section-kicker">Workspace Login</span>
+          <h1>Access your RealtyOS dashboard.</h1>
           <p>
-            This workspace is reserved for admin users managing lead flow,
-            qualification, and booking.
+            Sign in to manage your real estate pipeline, respond to clients, and oversee your lead flow.
           </p>
         </div>
 
         <form className="login-form" onSubmit={handleSubmit}>
           <input
             autoComplete="email"
-            placeholder="Admin email"
+            placeholder="Agent or admin email"
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}

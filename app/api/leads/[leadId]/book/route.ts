@@ -1,38 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import { markLeadBooked } from "@/lib/booking";
 import { deriveTags } from "@/lib/domain";
-import { mutateState } from "@/lib/store";
-import { BookingPayload } from "@/lib/types";
+import { getLeadById, persistLeadFromDomain } from "@/lib/db-helpers";
+import { prismaLeadToLeadRecord } from "@/lib/db-mappers";
+import { bookingSchema } from "@/lib/validations";
 
 export const runtime = "nodejs";
 
 type Context = {
-  params: { leadId: string };
+  params: Promise<{ leadId: string }>;
 };
 
 export async function POST(req: NextRequest, context: Context) {
-  let payload: BookingPayload = {};
+  let payload: unknown = {};
   try {
-    payload = (await req.json()) as BookingPayload;
+    payload = await req.json();
   } catch {
     payload = {};
   }
 
-  const result = await mutateState((state) => {
-    const existing = state.leads[context.params.leadId];
-    if (!existing) {
-      return null;
-    }
+  const parsed = bookingSchema.safeParse(payload);
+  const slot = parsed.success ? parsed.data.slot : undefined;
 
-    const next = markLeadBooked(existing, payload.slot);
-    next.tags = deriveTags(next);
-    state.leads[next.id] = next;
-    return next;
-  });
+  const { leadId } = await context.params;
 
-  if (!result) {
+  const prismaLead = await getLeadById(leadId);
+  if (!prismaLead) {
     return NextResponse.json({ error: "Lead not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ lead: result });
+  let leadRecord = prismaLeadToLeadRecord(prismaLead);
+  leadRecord = markLeadBooked(leadRecord, slot);
+  leadRecord.tags = deriveTags(leadRecord);
+
+  await persistLeadFromDomain({ ...leadRecord, id: leadId });
+
+  return NextResponse.json({ lead: leadRecord });
 }
