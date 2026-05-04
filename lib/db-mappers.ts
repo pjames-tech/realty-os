@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import { db } from "@/lib/db";
 import type {
   LeadRecord,
   LeadStatus,
@@ -7,26 +7,6 @@ import type {
   QualificationState,
   Appointment,
 } from "@/lib/types";
-
-/**
- * The Prisma lead shape when queried with all relations included.
- */
-export type PrismaLeadWithRelations = Prisma.LeadGetPayload<{
-  include: {
-    qualification: true;
-    conversations: true;
-    agentMessages: true;
-    appointment: true;
-    tags: true;
-    agent: true;
-  };
-}>;
-
-/** Map Prisma LeadStatus enum to the domain string union */
-function mapStatus(prismaStatus: string): LeadStatus {
-  if (prismaStatus === "new_lead") return "new";
-  return prismaStatus as LeadStatus;
-}
 
 /** The include object to pass to Prisma queries for a full lead */
 export const leadInclude = {
@@ -37,6 +17,22 @@ export const leadInclude = {
   tags: true,
   agent: true,
 } as const;
+
+/**
+ * The Prisma lead shape when queried with all relations included.
+ * Inferred from the actual query to avoid importing the Prisma namespace.
+ */
+export type PrismaLeadWithRelations = Awaited<
+  ReturnType<typeof db.lead.findFirst<{ include: typeof leadInclude }>>
+> & {};
+
+/** Map Prisma LeadStatus enum to the domain string union */
+function mapStatus(prismaStatus: string): LeadStatus {
+  if (prismaStatus === "new_lead") return "new";
+  return prismaStatus as LeadStatus;
+}
+
+
 
 /**
  * Convert a Prisma Lead (with all relations) to the domain LeadRecord type.
