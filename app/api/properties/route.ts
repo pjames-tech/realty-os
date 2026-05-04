@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth-config";
 import { propertyCreateSchema, propertySearchSchema } from "@/lib/validations";
-import { Prisma } from "@prisma/client";
 
 export const runtime = "nodejs";
 
@@ -15,7 +14,8 @@ export async function GET(req: NextRequest) {
 
   const { q, city, minPrice, maxPrice, minBeds, type, status, take, skip } = parsed.data;
 
-  const where: Prisma.PropertyWhereInput = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const where: Record<string, any> = {
     status: status ?? "active",
   };
 
