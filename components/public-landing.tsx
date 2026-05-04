@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "./icons";
+import { Logo } from "./logo";
 
 /* ── Counting animation hook ── */
 function useCountUp(end: number, suffix: string, duration: number = 1800) {
@@ -142,9 +143,7 @@ export function PublicLanding() {
       {/* ── Header ── */}
       <header className="b2b-header">
         <Link className="b2b-logo" href="/">
-          <span className="b2b-logo-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1" fill="#ff7300"/><rect x="14" y="3" width="7" height="5" rx="1" fill="#ff7300"/><rect x="14" y="12" width="7" height="9" rx="1" fill="#ff7300"/><rect x="3" y="16" width="7" height="5" rx="1" fill="#ff7300"/></svg>
-          </span>
+          <Logo size={28} />
           <strong>RealtyOS</strong>
         </Link>
         <nav className="b2b-nav">
@@ -302,9 +301,7 @@ export function PublicLanding() {
         <div className="b2b-footer-grid">
           <div className="b2b-footer-brand">
             <div className="b2b-footer-logo">
-              <span className="b2b-logo-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1" fill="#ff7300"/><rect x="14" y="3" width="7" height="5" rx="1" fill="#ff7300"/><rect x="14" y="12" width="7" height="9" rx="1" fill="#ff7300"/><rect x="3" y="16" width="7" height="5" rx="1" fill="#ff7300"/></svg>
-              </span>
+              <Logo size={28} />
               <strong>RealtyOS</strong>
             </div>
             <p>The intelligent layer for real estate professionals. Scale your business without scaling your overhead.</p>

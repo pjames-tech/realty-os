@@ -7,6 +7,8 @@ import { NotificationPanel } from "@/components/notification-panel";
 import { useNotifications } from "@/lib/use-notifications";
 import { createClient } from "@/lib/supabase/client";
 
+import { Logo } from "@/components/logo";
+
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", icon: "LayoutDashboard" },
   { href: "/admin/leads", label: "Leads", icon: "Users" },
@@ -125,7 +127,7 @@ export function AdminShell({
       <aside className="crm-sidebar">
         <div className="crm-brand">
           <div className="crm-logo-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+            <Logo size={24} />
           </div>
           <div className="crm-brand-text">
             <strong>RealtyOS</strong>

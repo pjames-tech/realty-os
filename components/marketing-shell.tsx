@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import type { ReactNode } from "react";
+import { Logo } from "@/components/logo";
 
 type MarketingLink = {
   href: Route;
@@ -47,9 +48,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
         zIndex: 10,
       }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
-          <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#ff7300", display: "grid", placeItems: "center" }}>
-            <svg width="18" height="18" fill="#fff" viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2 2h8v2H8V8zm0 4h5v2H8v-2z" /></svg>
-          </div>
+          <Logo size={32} />
           <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "#1E293B" }}>RealtyOS</span>
         </Link>
         <nav style={{ display: "flex", gap: "24px", alignItems: "center" }}>
@@ -86,9 +85,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", marginBottom: "32px" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-                <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#ff7300", display: "grid", placeItems: "center" }}>
-                  <svg width="18" height="18" fill="#fff" viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2 2h8v2H8V8zm0 4h5v2H8v-2z" /></svg>
-                </div>
+                <Logo size={32} />
                 <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "#1E293B" }}>RealtyOS</span>
               </div>
               <p style={{ color: "#64748B", fontSize: "0.9rem", lineHeight: 1.5, margin: 0, maxWidth: "280px" }}>
