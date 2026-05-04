@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireClient, AuthError } from "@/lib/auth-config";
 import { db } from "@/lib/db";
 import { appendAgentMessage } from "@/lib/db-helpers";
+import type { AgentMessage } from "@prisma/client";
 
 export const runtime = "nodejs";
 
@@ -16,7 +17,7 @@ export async function GET(_request: NextRequest) {
     });
 
     return NextResponse.json({
-      messages: messages.map((m) => ({
+      messages: messages.map((m: AgentMessage) => ({
         id: m.id,
         sender: m.sender,
         content: m.content,
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      messages: messages.map((m) => ({
+      messages: messages.map((m: AgentMessage) => ({
         id: m.id,
         sender: m.sender,
         content: m.content,
