@@ -1,4 +1,5 @@
 import { MarketingShell, MarketingHero, MarketingSection, FeatureCard } from "@/components/marketing-shell";
+import { Icon } from "@/components/icons";
 
 export default function CareersPage() {
   return (
@@ -37,9 +38,9 @@ export default function CareersPage() {
           What we care about
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
-          <FeatureCard icon="🧠" title="Taste over process" description="We ship small, review closely, and trust judgment over checklists." />
-          <FeatureCard icon="⚙️" title="Craft in production" description="We own our stack end-to-end — infra, data, AI, UX. Generalists thrive." />
-          <FeatureCard icon="🤝" title="Customers in the loop" description="Every engineer talks to agents. Every designer watches real sessions." />
+          <FeatureCard icon={<Icon.Brain size={22} />} title="Taste over process" description="We ship small, review closely, and trust judgment over checklists." />
+          <FeatureCard icon={<Icon.Wrench size={22} />} title="Craft in production" description="We own our stack end-to-end — infra, data, AI, UX. Generalists thrive." />
+          <FeatureCard icon={<Icon.Handshake size={22} />} title="Customers in the loop" description="Every engineer talks to agents. Every designer watches real sessions." />
         </div>
       </MarketingSection>
     </MarketingShell>

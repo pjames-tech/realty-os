@@ -33,11 +33,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Create Supabase Auth user
-    const supabase = await createClient();
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    // Create Supabase Auth user via admin API (bypasses rate limits + email confirmation)
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    const supabaseAdmin = createAdminClient();
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
+      email_confirm: true,
     });
 
     if (authError || !authData.user) {

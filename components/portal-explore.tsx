@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useState, useCallback } from "react";
 import { PropertyCard, formatPrice, formatPropertyType } from "@/lib/property-types";
+import { useToast } from "@/components/toast";
+import { Icon } from "./icons";
 
 const PROPERTY_TYPES = [
   { value: "", label: "All Types" },
@@ -29,6 +31,7 @@ export function PortalExplore() {
   const [type, setType] = useState("");
   const [priceIdx, setPriceIdx] = useState(0);
   const [minBeds, setMinBeds] = useState("");
+  const { toast } = useToast();
 
   const loadSaved = useCallback(async () => {
     const res = await fetch("/api/client/saved", { cache: "no-store" });
@@ -91,9 +94,9 @@ export function PortalExplore() {
       }),
     });
     if (res.ok) {
-      alert("Tour requested! Your agent will confirm the time.");
+      toast("Tour requested! Your agent will confirm the time.");
     } else {
-      alert("Could not request tour. Please try again.");
+      toast("Could not request tour. Please try again.", "error");
     }
   }
 
@@ -182,13 +185,20 @@ export function PortalExplore() {
                   onClick={() => toggleSave(p.id)}
                   style={{ position: "absolute", top: "12px", right: "12px" }}
                 >
-                  {savedIds.has(p.id) ? "♥" : "♡"}
+                  {savedIds.has(p.id) ? <Icon.HeartFilled size={16} /> : <Icon.Heart size={16} />}
                 </button>
               </div>
               <div className="cd-rec-info" style={{ padding: "20px" }}>
                 <div className="cd-rec-price-row" style={{ marginBottom: "8px" }}>
                   <strong style={{ fontSize: "1.3rem" }}>{formatPrice(p.price)}</strong>
-                  <span>🛏 {p.beds} 🚿 {p.baths}</span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <Icon.Bed size={14} /> {p.beds}
+                    </span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <Icon.Bath size={14} /> {p.baths}
+                    </span>
+                  </span>
                 </div>
                 <strong style={{ display: "block", marginBottom: "4px" }}>{p.title}</strong>
                 <p className="cd-rec-location">{p.city}, {p.state}</p>

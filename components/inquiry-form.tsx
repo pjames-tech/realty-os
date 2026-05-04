@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Icon } from "./icons";
+import type { ReactNode } from "react";
 
 const TOTAL_STEPS = 6;
 const budgetOptions = ["Under $500k", "$500k - $1M", "$1M - $3M", "Above $3M"];
-const propertyOptions = [
-  { label: "Single Family", icon: "🏡" },
-  { label: "Condo", icon: "🏢" },
-  { label: "Townhouse", icon: "🏘️" },
-  { label: "Apartment", icon: "🏙️" },
+const propertyOptions: { label: string; icon: ReactNode }[] = [
+  { label: "Single Family", icon: <Icon.Home size={24} /> },
+  { label: "Condo", icon: <Icon.Building size={24} /> },
+  { label: "Townhouse", icon: <Icon.Neighborhood size={24} /> },
+  { label: "Apartment", icon: <Icon.Skyline size={24} /> },
 ];
 const timelineOptions = ["ASAP", "1-3 Months", "3-6 Months", "Just Browsing"];
 
@@ -98,11 +100,21 @@ function InquiryFormInner() {
         <div className="inquiry-top">
           {step > 1 ? (
             <button className="back-link" onClick={handleBack} type="button">
-              ← Back
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                <span style={{ transform: "rotate(180deg)", display: "inline-flex" }}>
+                  <Icon.ArrowRight size={14} />
+                </span>
+                Back
+              </span>
             </button>
           ) : (
             <Link className="back-link" href="/">
-              ← Home
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                <span style={{ transform: "rotate(180deg)", display: "inline-flex" }}>
+                  <Icon.ArrowRight size={14} />
+                </span>
+                Home
+              </span>
             </Link>
           )}
           <h1>RealtyOS</h1>
@@ -222,7 +234,7 @@ function InquiryFormInner() {
                     onClick={() => setPropertyType(opt.label)}
                     type="button"
                   >
-                    <span style={{ fontSize: "1.8rem" }}>{opt.icon}</span>
+                    <span style={{ display: "inline-flex", color: "#ff7300" }}>{opt.icon}</span>
                     <strong>{opt.label}</strong>
                   </button>
                 ))}
@@ -258,11 +270,14 @@ function InquiryFormInner() {
             onClick={handleNext}
             type="button"
           >
-            {submitting
-              ? "Setting up your account..."
-              : step === TOTAL_STEPS
-              ? "Create My Account →"
-              : "Continue →"}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+              {submitting
+                ? "Setting up your account..."
+                : step === TOTAL_STEPS
+                ? "Create My Account"
+                : "Continue"}
+              {!submitting && <Icon.ArrowRight size={16} />}
+            </span>
           </button>
 
           {error && <p className="form-error">{error}</p>}

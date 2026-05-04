@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MarketingShell, MarketingHero, MarketingSection } from "@/components/marketing-shell";
+import { Icon } from "@/components/icons";
 
 export default function DemoPage() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
@@ -54,7 +55,9 @@ export default function DemoPage() {
                 "Integrations for your existing stack",
               ].map((item) => (
                 <li key={item} style={{ display: "flex", gap: "12px", alignItems: "flex-start", color: "#475569", lineHeight: 1.6 }}>
-                  <span style={{ color: "#F25C05", fontWeight: "700" }}>→</span>
+                  <span style={{ color: "#ff7300", display: "inline-flex", marginTop: "3px" }} aria-hidden="true">
+                    <Icon.Check size={16} />
+                  </span>
                   {item}
                 </li>
               ))}
@@ -71,7 +74,22 @@ export default function DemoPage() {
                 textAlign: "center",
               }}
             >
-              <div style={{ fontSize: "2.5rem", marginBottom: "12px" }}>✅</div>
+              <div
+                style={{
+                  width: "56px",
+                  height: "56px",
+                  borderRadius: "50%",
+                  background: "#FFF7ED",
+                  color: "#ff7300",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 16px",
+                }}
+                aria-hidden="true"
+              >
+                <Icon.Check size={26} />
+              </div>
               <h2 style={{ margin: "0 0 12px 0", fontSize: "1.3rem", fontWeight: "800", color: "#0F172A" }}>
                 Demo requested
               </h2>
@@ -142,7 +160,7 @@ export default function DemoPage() {
                 disabled={status === "submitting"}
                 style={{
                   padding: "12px 24px",
-                  background: "#F25C05",
+                  background: "#ff7300",
                   color: "#FFF",
                   border: "none",
                   borderRadius: "8px",

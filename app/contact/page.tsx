@@ -93,7 +93,7 @@ export default function ContactPage() {
               disabled={status === "submitting"}
               style={{
                 padding: "12px 24px",
-                background: "#F25C05",
+                background: "#ff7300",
                 color: "#FFF",
                 border: "none",
                 borderRadius: "8px",

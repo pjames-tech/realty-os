@@ -32,7 +32,7 @@ export function SuperAdminShell({ children }: { children: ReactNode }) {
       <aside style={{ width: "260px", background: "#FFFFFF", borderRight: "1px solid #E2E8F0", display: "flex", flexDirection: "column" }}>
         {/* Brand */}
         <div style={{ padding: "24px 20px", display: "flex", alignItems: "center", gap: "12px", borderBottom: "1px solid #E2E8F0" }}>
-          <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#F25C05", display: "grid", placeItems: "center" }}>
+          <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#ff7300", display: "grid", placeItems: "center" }}>
             <svg width="22" height="22" fill="#fff" viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2 2h8v2H8V8zm0 4h5v2H8v-2z"/></svg>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
@@ -53,14 +53,14 @@ export function SuperAdminShell({ children }: { children: ReactNode }) {
                     style={{
                       display: "flex", alignItems: "center", gap: "16px", padding: "12px 24px",
                       background: isActive ? "#FFF6F0" : "transparent",
-                      color: isActive ? "#F25C05" : "#64748B",
+                      color: isActive ? "#ff7300" : "#64748B",
                       fontWeight: isActive ? "600" : "500",
                       textDecoration: "none",
-                      borderRight: isActive ? "3px solid #F25C05" : "3px solid transparent",
+                      borderRight: isActive ? "3px solid #ff7300" : "3px solid transparent",
                       transition: "all 0.2s ease"
                     }}
                   >
-                    <span style={{ color: isActive ? "#F25C05" : "#94A3B8" }}>{link.icon}</span>
+                    <span style={{ color: isActive ? "#ff7300" : "#94A3B8" }}>{link.icon}</span>
                     <span style={{ fontSize: "0.95rem" }}>{link.label}</span>
                   </Link>
                 </li>

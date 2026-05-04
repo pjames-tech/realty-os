@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MarketingShell, MarketingHero, MarketingSection } from "@/components/marketing-shell";
+import { Icon } from "@/components/icons";
 
 type Step = { num: string; title: string; desc: string; details: string[] };
 
@@ -81,7 +82,7 @@ export default function GettingStartedPage() {
                 <span
                   style={{
                     background: "#FFF7ED",
-                    color: "#F25C05",
+                    color: "#ff7300",
                     fontWeight: "800",
                     fontSize: "1rem",
                     width: "44px",
@@ -100,7 +101,9 @@ export default function GettingStartedPage() {
                   <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "8px" }}>
                     {step.details.map((d) => (
                       <li key={d} style={{ fontSize: "0.9rem", color: "#64748B", display: "flex", gap: "10px", alignItems: "center" }}>
-                        <span style={{ color: "#22C55E", fontWeight: "700" }}>✓</span>
+                        <span style={{ color: "#ff7300", display: "inline-flex" }} aria-hidden="true">
+                          <Icon.Check size={16} />
+                        </span>
                         {d}
                       </li>
                     ))}
@@ -118,7 +121,7 @@ export default function GettingStartedPage() {
             href="/admin/register"
             style={{
               display: "inline-block",
-              background: "#F25C05",
+              background: "#ff7300",
               color: "#FFFFFF",
               padding: "14px 32px",
               borderRadius: "8px",
@@ -127,7 +130,9 @@ export default function GettingStartedPage() {
               textDecoration: "none",
             }}
           >
-            Create your free account →
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
+              Create your free account <Icon.ArrowRight size={16} />
+            </span>
           </Link>
           <p style={{ marginTop: "16px", fontSize: "0.9rem", color: "#94A3B8" }}>
             No credit card required. Start qualifying leads in minutes.

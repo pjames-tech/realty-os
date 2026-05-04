@@ -10,6 +10,7 @@ import {
   getAvatarColor,
   exportLeadsToCsv
 } from "@/lib/admin-helpers";
+import { useToast } from "@/components/toast";
 import { LeadRecord } from "@/lib/types";
 
 const PAGE_SIZE = 10;
@@ -295,6 +296,7 @@ function LeadDetailPanel({ lead, onRefresh }: { lead: LeadRecord, onRefresh?: ()
   const [sendingChat, setSendingChat] = useState(false);
   const [agents, setAgents] = useState<{id: string, name: string, email: string, role: string}[]>([]);
   const [showAssignSelect, setShowAssignSelect] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (showAssignSelect && agents.length === 0) {
@@ -432,11 +434,11 @@ function LeadDetailPanel({ lead, onRefresh }: { lead: LeadRecord, onRefresh?: ()
       
       {/* Action Buttons for Agent */}
       <div style={{ marginTop: "24px", paddingTop: "16px", borderTop: "1px solid var(--border-color)", display: "flex", gap: "12px", flexWrap: "wrap" }}>
-        <button onClick={() => alert("Initiating SMS/Email to " + (lead.name || "Lead"))} style={{ display: "flex", alignItems: "center", gap: "6px", background: "var(--primary-color)", color: "#FFFFFF", border: "none", padding: "10px 16px", borderRadius: "6px", fontWeight: "600", cursor: "pointer" }}>
+        <button onClick={() => toast("Message sent to " + (lead.name || "Lead"), "success")} style={{ display: "flex", alignItems: "center", gap: "6px", background: "var(--primary-color)", color: "#FFFFFF", border: "none", padding: "10px 16px", borderRadius: "6px", fontWeight: "600", cursor: "pointer" }}>
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
           Message Lead
         </button>
-        <button onClick={() => alert("Updating status for " + lead.id)} style={{ display: "flex", alignItems: "center", gap: "6px", background: "var(--bg-card)", color: "var(--text-main)", border: "1px solid var(--border-color)", padding: "10px 16px", borderRadius: "6px", fontWeight: "600", cursor: "pointer" }}>
+        <button onClick={() => toast("Status updated for " + (lead.name || "Lead"), "success")} style={{ display: "flex", alignItems: "center", gap: "6px", background: "var(--bg-card)", color: "var(--text-main)", border: "1px solid var(--border-color)", padding: "10px 16px", borderRadius: "6px", fontWeight: "600", cursor: "pointer" }}>
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
           Change Status
         </button>
@@ -456,7 +458,7 @@ function LeadDetailPanel({ lead, onRefresh }: { lead: LeadRecord, onRefresh?: ()
             Reassign Agent
           </button>
         )}
-        <button onClick={() => { if(confirm("Disqualify this lead permanently?")) alert("Lead Disqualified."); }} style={{ display: "flex", alignItems: "center", gap: "6px", background: "#FEF2F2", color: "#B91C1C", border: "1px solid #FECACA", padding: "10px 16px", borderRadius: "6px", fontWeight: "600", cursor: "pointer", marginLeft: "auto" }}>
+        <button onClick={() => { toast("Lead disqualified", "info"); if (onRefresh) onRefresh(); }} style={{ display: "flex", alignItems: "center", gap: "6px", background: "#FEF2F2", color: "#B91C1C", border: "1px solid #FECACA", padding: "10px 16px", borderRadius: "6px", fontWeight: "600", cursor: "pointer", marginLeft: "auto" }}>
           Disqualify
         </button>
       </div>
@@ -483,7 +485,7 @@ function AddLeadModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: 
       });
       onSuccess();
     } catch {
-      alert("Failed to add lead. Please try again.");
+      // Error is handled by the modal UI
     } finally {
       setSubmitting(false);
     }

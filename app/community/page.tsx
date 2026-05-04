@@ -1,12 +1,16 @@
+import type { ReactNode } from "react";
 import { MarketingShell, MarketingHero, MarketingSection } from "@/components/marketing-shell";
+import { Icon } from "@/components/icons";
 
-const GROUPS = [
-  { icon: "📊", name: "Market Intel", desc: "Local market trends, pricing data, and investment insights." },
-  { icon: "🎯", name: "Lead Generation", desc: "Strategies for acquiring and converting more leads." },
-  { icon: "🚀", name: "New Agent Hub", desc: "Guidance, mentorship, and first-deal stories." },
-  { icon: "⚙️", name: "Tech & Tools", desc: "RealtyOS features, CRM hacks, and integrations." },
-  { icon: "🏛️", name: "Luxury & Commercial", desc: "High-end property discussions and deal structures." },
-  { icon: "📣", name: "Marketing Playbooks", desc: "Social content, paid-ads frameworks, and funnel teardowns." },
+type Group = { icon: ReactNode; name: string; desc: string };
+
+const GROUPS: Group[] = [
+  { icon: <Icon.Chart size={22} />, name: "Market Intel", desc: "Local market trends, pricing data, and investment insights." },
+  { icon: <Icon.Target size={22} />, name: "Lead Generation", desc: "Strategies for acquiring and converting more leads." },
+  { icon: <Icon.Spark size={22} />, name: "New Agent Hub", desc: "Guidance, mentorship, and first-deal stories." },
+  { icon: <Icon.Wrench size={22} />, name: "Tech & Tools", desc: "RealtyOS features, CRM hacks, and integrations." },
+  { icon: <Icon.Building size={22} />, name: "Luxury & Commercial", desc: "High-end property discussions and deal structures." },
+  { icon: <Icon.Megaphone size={22} />, name: "Marketing Playbooks", desc: "Social content, paid-ads frameworks, and funnel teardowns." },
 ];
 
 export default function CommunityPage() {
@@ -33,7 +37,21 @@ export default function CommunityPage() {
                 padding: "24px",
               }}
             >
-              <div style={{ fontSize: "1.8rem", marginBottom: "10px" }}>{g.icon}</div>
+              <div
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "#FFF7ED",
+                  color: "#ff7300",
+                  borderRadius: "10px",
+                  marginBottom: "12px",
+                }}
+              >
+                {g.icon}
+              </div>
               <h3 style={{ margin: "0 0 6px 0", fontSize: "1rem", fontWeight: "700", color: "#0F172A" }}>{g.name}</h3>
               <p style={{ margin: 0, color: "#64748B", fontSize: "0.9rem", lineHeight: 1.6 }}>{g.desc}</p>
             </div>
@@ -57,13 +75,13 @@ export default function CommunityPage() {
             Join the conversation
           </h2>
           <p style={{ color: "#475569", lineHeight: 1.6, margin: "0 0 24px 0" }}>
-            The RealtyOS community lives on Slack. Every new customer gets an invite; if you'd like early access, email us.
+            The RealtyOS community lives on Slack. Every new customer gets an invite; if you&apos;d like early access, email us.
           </p>
           <a
             href="mailto:community@realtyos.com?subject=Community%20invite"
             style={{
               display: "inline-block",
-              background: "#F25C05",
+              background: "#ff7300",
               color: "#FFFFFF",
               padding: "12px 28px",
               borderRadius: "8px",

@@ -1,3 +1,5 @@
+"use client";
+
 import { MarketingShell, MarketingHero, MarketingSection } from "@/components/marketing-shell";
 
 type Tutorial = { title: string; duration: string; desc: string };
@@ -56,7 +58,7 @@ export default function TutorialsPage() {
                   color: "#0F172A",
                   margin: "0 0 16px 0",
                   paddingBottom: "8px",
-                  borderBottom: "2px solid #F25C05",
+                  borderBottom: "2px solid #ff7300",
                   display: "inline-block",
                 }}
               >
@@ -74,7 +76,11 @@ export default function TutorialsPage() {
                       display: "flex",
                       gap: "16px",
                       alignItems: "center",
+                      cursor: "default",
+                      transition: "border-color 0.2s",
                     }}
+                    onMouseOver={(e) => e.currentTarget.style.borderColor = "#FDBA74"}
+                    onMouseOut={(e) => e.currentTarget.style.borderColor = "#E2E8F0"}
                   >
                     <div
                       style={{
@@ -87,7 +93,7 @@ export default function TutorialsPage() {
                         flexShrink: 0,
                       }}
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="#F25C05">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="#ff7300">
                         <polygon points="5 3 19 12 5 21 5 3" />
                       </svg>
                     </div>
@@ -95,9 +101,14 @@ export default function TutorialsPage() {
                       <h4 style={{ margin: "0 0 4px 0", fontSize: "0.95rem", fontWeight: "600", color: "#0F172A" }}>{item.title}</h4>
                       <p style={{ margin: 0, fontSize: "0.85rem", color: "#64748B", lineHeight: 1.5 }}>{item.desc}</p>
                     </div>
-                    <span style={{ fontSize: "0.8rem", fontWeight: "600", color: "#94A3B8", whiteSpace: "nowrap" }}>
-                      {item.duration}
-                    </span>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px", flexShrink: 0 }}>
+                      <span style={{ fontSize: "0.8rem", fontWeight: "600", color: "#94A3B8", whiteSpace: "nowrap" }}>
+                        {item.duration}
+                      </span>
+                      <span style={{ fontSize: "0.65rem", fontWeight: "700", padding: "2px 8px", borderRadius: "100px", background: "#FEF3C7", color: "#92400E", textTransform: "uppercase", letterSpacing: "0.03em" }}>
+                        Coming Soon
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>

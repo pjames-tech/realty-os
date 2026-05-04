@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { PropertyCard, formatPrice, formatPropertyType } from "@/lib/property-types";
+import { Icon } from "./icons";
 
 type FormState = {
   title: string;
@@ -148,7 +149,7 @@ export function AdminListingsView() {
         </div>
         <button
           onClick={openCreate}
-          style={{ padding: "10px 20px", background: "#F25C05", color: "#FFF", border: "none", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}
+          style={{ padding: "10px 20px", background: "#ff7300", color: "#FFF", border: "none", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}
         >
           + New Listing
         </button>
@@ -186,10 +187,18 @@ export function AdminListingsView() {
                 <p style={{ margin: "0 0 12px 0", color: "#64748B", fontSize: "0.85rem" }}>
                   {p.city}, {p.state} · {formatPropertyType(p.type)}
                 </p>
-                <div style={{ display: "flex", gap: "12px", fontSize: "0.85rem", color: "#475569", marginBottom: "16px" }}>
-                  <span>🛏 {p.beds}</span>
-                  <span>🚿 {p.baths}</span>
-                  {p.sqft && <span>📐 {p.sqft.toLocaleString()} sqft</span>}
+                <div style={{ display: "flex", gap: "14px", fontSize: "0.85rem", color: "#475569", marginBottom: "16px" }}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                    <Icon.Bed size={14} /> {p.beds}
+                  </span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                    <Icon.Bath size={14} /> {p.baths}
+                  </span>
+                  {p.sqft && (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <Icon.Ruler size={14} /> {p.sqft.toLocaleString()} sqft
+                    </span>
+                  )}
                 </div>
                 <div style={{ display: "flex", gap: "8px", marginTop: "auto" }}>
                   <button
@@ -297,7 +306,7 @@ export function AdminListingsView() {
               <button type="button" onClick={() => setShowForm(false)} style={{ padding: "10px 20px", background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}>
                 Cancel
               </button>
-              <button type="submit" disabled={saving} style={{ padding: "10px 20px", background: "#F25C05", color: "#FFF", border: "none", borderRadius: "8px", fontWeight: "600", cursor: saving ? "wait" : "pointer", opacity: saving ? 0.6 : 1 }}>
+              <button type="submit" disabled={saving} style={{ padding: "10px 20px", background: "#ff7300", color: "#FFF", border: "none", borderRadius: "8px", fontWeight: "600", cursor: saving ? "wait" : "pointer", opacity: saving ? 0.6 : 1 }}>
                 {saving ? "Saving..." : editingId ? "Save Changes" : "Create Listing"}
               </button>
             </div>

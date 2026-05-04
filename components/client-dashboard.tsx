@@ -13,6 +13,7 @@ import {
   formatTourType,
   formatRelativeTime,
 } from "@/lib/property-types";
+import { Icon } from "./icons";
 
 type Lead = {
   id: string;
@@ -118,21 +119,21 @@ export function ClientDashboard() {
 
       <section className="cd-stats-row" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px", marginBottom: "56px" }}>
         <Link href={"/portal/saved" as Route} className="cd-stat-card" style={{ padding: "32px 24px", textDecoration: "none", color: "inherit" }}>
-          <span className="cd-stat-icon cd-stat-icon-heart">♥</span>
+          <span className="cd-stat-icon cd-stat-icon-heart"><Icon.HeartFilled size={20} /></span>
           <div>
             <small>Saved Homes</small>
             <strong style={{ fontSize: "1.2rem" }}>{saved.length} {saved.length === 1 ? "Property" : "Properties"}</strong>
           </div>
         </Link>
         <Link href={"/portal/tours" as Route} className="cd-stat-card" style={{ padding: "32px 24px", textDecoration: "none", color: "inherit" }}>
-          <span className="cd-stat-icon cd-stat-icon-cal">📅</span>
+          <span className="cd-stat-icon cd-stat-icon-cal"><Icon.Calendar size={20} /></span>
           <div>
             <small>Upcoming Tours</small>
             <strong style={{ fontSize: "1.2rem" }}>{tours.length} Scheduled</strong>
           </div>
         </Link>
         <Link href={"/portal/explore" as Route} className="cd-stat-card" style={{ padding: "32px 24px", textDecoration: "none", color: "inherit" }}>
-          <span className="cd-stat-icon cd-stat-icon-ai">✨</span>
+          <span className="cd-stat-icon cd-stat-icon-ai"><Icon.Sparkle size={20} /></span>
           <div>
             <small>New Listings</small>
             <strong style={{ fontSize: "1.2rem" }}>{recommendations.length} Available</strong>
@@ -143,7 +144,12 @@ export function ClientDashboard() {
       {/* ── Recommendations ── */}
       <section className="cd-section" style={{ marginBottom: "56px" }}>
         <div className="cd-section-head" style={{ marginBottom: "24px" }}>
-          <h2 style={{ fontSize: "1.5rem" }}>✨ Recommended for You</h2>
+          <h2 style={{ fontSize: "1.5rem", display: "inline-flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ color: "#ff7300", display: "inline-flex" }} aria-hidden="true">
+              <Icon.Sparkle size={20} />
+            </span>
+            Recommended for You
+          </h2>
           <Link className="cd-view-all" href={"/portal/explore" as Route}>
             View all listings
           </Link>
@@ -161,14 +167,21 @@ export function ClientDashboard() {
                     aria-label={savedIds.has(p.id) ? "Unsave" : "Save"}
                     onClick={() => toggleSave(p.id)}
                   >
-                    {savedIds.has(p.id) ? "♥" : "♡"}
+                    {savedIds.has(p.id) ? <Icon.HeartFilled size={16} /> : <Icon.Heart size={16} />}
                   </button>
                 </div>
                 <div className="cd-rec-info" style={{ padding: "24px", flexGrow: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                   <div>
                     <div className="cd-rec-price-row" style={{ marginBottom: "8px" }}>
                       <strong style={{ fontSize: "1.4rem" }}>{formatPrice(p.price)}</strong>
-                      <span style={{ fontSize: "0.95rem" }}>🛏 {p.beds} 🚿 {p.baths}</span>
+                      <span style={{ fontSize: "0.95rem", display: "inline-flex", alignItems: "center", gap: "10px" }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                          <Icon.Bed size={14} /> {p.beds}
+                        </span>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                          <Icon.Bath size={14} /> {p.baths}
+                        </span>
+                      </span>
                     </div>
                     <p className="cd-rec-location" style={{ fontSize: "1.05rem", marginBottom: "16px" }}>{p.city}, {p.state}</p>
                   </div>
@@ -250,8 +263,8 @@ export function ClientDashboard() {
               {lead?.agentName ? "Senior Advisor" : "Pending assignment"}
             </span>
             <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%", marginTop: "16px" }}>
-              <Link href={"/portal/messages" as Route} className="cd-agent-message-btn" style={{ width: "100%", padding: "12px", textAlign: "center", textDecoration: "none" }}>
-                💬 Message
+              <Link href={"/portal/messages" as Route} className="cd-agent-message-btn" style={{ width: "100%", padding: "12px", textAlign: "center", textDecoration: "none", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                <Icon.Message size={16} /> Message
               </Link>
             </div>
           </div>
@@ -279,15 +292,19 @@ export function ClientDashboard() {
                     aria-label="Unsave"
                     onClick={() => toggleSave(s.property.id)}
                   >
-                    🧡
+                    <Icon.HeartFilled size={16} />
                   </button>
                 </div>
                 <div className="cd-saved-info" style={{ padding: "20px" }}>
                   <strong style={{ fontSize: "1.2rem", marginBottom: "4px", display: "block" }}>{formatPrice(s.property.price)}</strong>
                   <p style={{ margin: "0 0 12px 0", height: "40px" }}>{s.property.city}, {s.property.state}</p>
                   <div className="cd-saved-meta" style={{ paddingTop: "16px", borderTop: "1px solid #E2E8F0" }}>
-                    <span>📐 {s.property.sqft ?? "—"} sqft</span>
-                    <span>⏱ Saved {formatRelativeTime(s.savedAt)}</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <Icon.Ruler size={14} /> {s.property.sqft ?? "—"} sqft
+                    </span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <Icon.Clock size={14} /> Saved {formatRelativeTime(s.savedAt)}
+                    </span>
                   </div>
                 </div>
               </article>

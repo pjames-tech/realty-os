@@ -2,9 +2,10 @@
 
 import { useAdminData } from "@/lib/use-admin-data";
 import { getInitials, getSourceColor, getSourceLabel, getAvatarColor, timeAgo } from "@/lib/admin-helpers";
-import Image from "next/image";
+import { useToast } from "@/components/toast";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Icon } from "./icons";
 
 function getRoleFromCookie(): { role: string; org: string; email: string } {
   if (typeof document === "undefined") return { role: "SOLO_AGENT", org: "", email: "" };
@@ -17,6 +18,7 @@ function getRoleFromCookie(): { role: string; org: string; email: string } {
 export function AgentDashboard() {
   const { leads, metrics, stats, loading, refresh } = useAdminData();
   const [roleInfo, setRoleInfo] = useState({ role: "SOLO_AGENT", org: "", email: "" });
+  const { toast } = useToast();
 
   useEffect(() => { setRoleInfo(getRoleFromCookie()); }, []);
 
@@ -49,8 +51,9 @@ export function AgentDashboard() {
         </div>
         {isSolo && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px", flexShrink: 0 }}>
-            <button onClick={() => { const link = window.location.origin + "/inquiry" + (roleInfo.email ? `?agent=${encodeURIComponent(roleInfo.email)}` : ""); navigator.clipboard.writeText(link); alert("Inquiry link copied!"); }} style={{ background: "#F25C05", color: "#fff", border: "none", borderRadius: "6px", padding: "8px 16px", fontWeight: 600, fontSize: "0.8rem", cursor: "pointer", whiteSpace: "nowrap" }}>
-              📋 Copy Inquiry Link
+            <button onClick={() => { const link = window.location.origin + "/inquiry" + (roleInfo.email ? `?agent=${encodeURIComponent(roleInfo.email)}` : ""); navigator.clipboard.writeText(link); toast("Inquiry link copied to clipboard!"); }} style={{ background: "#ff7300", color: "#fff", border: "none", borderRadius: "6px", padding: "8px 16px", fontWeight: 600, fontSize: "0.8rem", cursor: "pointer", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "8px" }}>
+              <Icon.Clipboard size={14} />
+              Copy Inquiry Link
             </button>
             {roleInfo.email && <span style={{ fontSize: "0.7rem", color: "#94A3B8", fontFamily: "monospace" }}>/inquiry?agent={roleInfo.email}</span>}
           </div>
@@ -60,7 +63,9 @@ export function AgentDashboard() {
       {/* ── Empty State ── */}
       {displayLeads.length === 0 && (
         <section style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: "16px", padding: "48px 32px", textAlign: "center" }}>
-          <div style={{ fontSize: "3rem", marginBottom: "16px" }}>📭</div>
+          <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "64px", height: "64px", borderRadius: "16px", background: "#FFF7ED", color: "#ff7300", marginBottom: "16px" }} aria-hidden="true">
+            <Icon.Inbox size={32} />
+          </div>
           <h3 style={{ margin: "0 0 8px", fontSize: "1.2rem", fontWeight: 700, color: "#0F172A" }}>No leads yet</h3>
           <p style={{ margin: "0 0 24px", fontSize: "0.9rem", color: "#64748B", maxWidth: "400px", marginLeft: "auto", marginRight: "auto" }}>
             {isSolo
@@ -70,7 +75,7 @@ export function AgentDashboard() {
           </p>
           {isSolo && (
             <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-              <button onClick={() => { const link = window.location.origin + "/inquiry" + (roleInfo.email ? `?agent=${encodeURIComponent(roleInfo.email)}` : ""); navigator.clipboard.writeText(link); alert("Copied!"); }} style={{ background: "#F25C05", color: "#fff", border: "none", borderRadius: "8px", padding: "12px 24px", fontWeight: 600, cursor: "pointer" }}>Copy Inquiry Link</button>
+              <button onClick={() => { const link = window.location.origin + "/inquiry" + (roleInfo.email ? `?agent=${encodeURIComponent(roleInfo.email)}` : ""); navigator.clipboard.writeText(link); toast("Inquiry link copied!"); }} style={{ background: "#ff7300", color: "#fff", border: "none", borderRadius: "8px", padding: "12px 24px", fontWeight: 600, cursor: "pointer" }}>Copy Inquiry Link</button>
               <Link href={"/getting-started" as any} style={{ border: "1px solid #E2E8F0", borderRadius: "8px", padding: "12px 24px", fontWeight: 600, color: "#475569", textDecoration: "none" }}>View Setup Guide</Link>
             </div>
           )}
@@ -178,7 +183,7 @@ export function AgentDashboard() {
                       </div>
                     </div>
                   </div>
-                  <button onClick={() => alert("Initiating call to " + (lead.name || lead.email))} className="crm-feed-action-btn phone">
+                  <button onClick={() => toast("Call initiated to " + (lead.name || lead.email), "info")} className="crm-feed-action-btn phone">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                   </button>
                 </div>

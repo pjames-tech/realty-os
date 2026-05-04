@@ -1,4 +1,5 @@
 import { MarketingShell, MarketingHero, MarketingSection, FeatureCard } from "@/components/marketing-shell";
+import { Icon } from "@/components/icons";
 
 export default function AboutPage() {
   return (
@@ -31,19 +32,19 @@ export default function AboutPage() {
             </h3>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "14px" }}>
               <li style={{ color: "#475569", display: "flex", gap: "12px", alignItems: "flex-start" }}>
-                <span style={{ color: "#F25C05", fontWeight: "700" }}>→</span>
+                <span style={{ color: "#ff7300", fontWeight: "700", display: "inline-flex" }} aria-hidden="true"><Icon.ArrowRight size={16} /></span>
                 AI-native — not AI bolted on top of a CRM from 2008.
               </li>
               <li style={{ color: "#475569", display: "flex", gap: "12px", alignItems: "flex-start" }}>
-                <span style={{ color: "#F25C05", fontWeight: "700" }}>→</span>
+                <span style={{ color: "#ff7300", fontWeight: "700", display: "inline-flex" }} aria-hidden="true"><Icon.ArrowRight size={16} /></span>
                 Built for real estate, not a generic tool with industry skins.
               </li>
               <li style={{ color: "#475569", display: "flex", gap: "12px", alignItems: "flex-start" }}>
-                <span style={{ color: "#F25C05", fontWeight: "700" }}>→</span>
+                <span style={{ color: "#ff7300", fontWeight: "700", display: "inline-flex" }} aria-hidden="true"><Icon.ArrowRight size={16} /></span>
                 Enterprise-grade without the enterprise price tag.
               </li>
               <li style={{ color: "#475569", display: "flex", gap: "12px", alignItems: "flex-start" }}>
-                <span style={{ color: "#F25C05", fontWeight: "700" }}>→</span>
+                <span style={{ color: "#ff7300", fontWeight: "700", display: "inline-flex" }} aria-hidden="true"><Icon.ArrowRight size={16} /></span>
                 Transparent, honest pricing. No sales calls required.
               </li>
             </ul>
@@ -56,9 +57,9 @@ export default function AboutPage() {
           What we&apos;re building
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
-          <FeatureCard icon="⚡" title="Instant lead qualification" description="Sloane, our AI receptionist, qualifies inbound leads 24/7 in under 3 seconds." />
-          <FeatureCard icon="🎯" title="Smart routing" description="Leads are matched to the right agent based on specialty, territory, and availability." />
-          <FeatureCard icon="📊" title="Pipeline clarity" description="Every conversation, booking, and handoff surfaces in one unified timeline." />
+          <FeatureCard icon={<Icon.Bolt size={22} />} title="Instant lead qualification" description="Sloane, our AI receptionist, qualifies inbound leads 24/7 in under 3 seconds." />
+          <FeatureCard icon={<Icon.Target size={22} />} title="Smart routing" description="Leads are matched to the right agent based on specialty, territory, and availability." />
+          <FeatureCard icon={<Icon.Chart size={22} />} title="Pipeline clarity" description="Every conversation, booking, and handoff surfaces in one unified timeline." />
         </div>
       </MarketingSection>
     </MarketingShell>

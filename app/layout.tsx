@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { PublicAssistantLayer } from "@/components/public-assistant-layer";
+import { ToastProvider } from "@/components/toast";
 import "./globals.css";
 
 const inter = Inter({
@@ -38,9 +39,12 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.variable} suppressHydrationWarning>
-        {children}
-        <PublicAssistantLayer />
+        <ToastProvider>
+          {children}
+          <PublicAssistantLayer />
+        </ToastProvider>
       </body>
     </html>
   );
 }
+

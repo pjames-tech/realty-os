@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Route } from "next";
 import { SavedRecord, formatPrice, formatRelativeTime } from "@/lib/property-types";
+import { Icon } from "./icons";
 
 export function PortalSaved() {
   const [saved, setSaved] = useState<SavedRecord[]>([]);
@@ -58,7 +59,7 @@ export function PortalSaved() {
                   aria-label="Unsave"
                   onClick={() => unsave(s.property.id)}
                 >
-                  🧡
+                  <Icon.HeartFilled size={18} />
                 </button>
               </div>
               <div className="cd-saved-info" style={{ padding: "20px" }}>
@@ -68,8 +69,17 @@ export function PortalSaved() {
                   {s.property.city}, {s.property.state}
                 </p>
                 <div className="cd-saved-meta" style={{ paddingTop: "16px", borderTop: "1px solid #E2E8F0" }}>
-                  <span>🛏 {s.property.beds} 🚿 {s.property.baths}</span>
-                  <span>⏱ {formatRelativeTime(s.savedAt)}</span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <Icon.Bed size={14} /> {s.property.beds}
+                    </span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <Icon.Bath size={14} /> {s.property.baths}
+                    </span>
+                  </span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                    <Icon.Clock size={14} /> {formatRelativeTime(s.savedAt)}
+                  </span>
                 </div>
               </div>
             </article>

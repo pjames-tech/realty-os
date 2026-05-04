@@ -4,7 +4,7 @@ import { MarketingShell, MarketingHero, MarketingSection } from "@/components/ma
 type Integration = {
   id: string;
   name: string;
-  icon: string;
+  monogram: string;
   color: string;
   description: string;
   features: string[];
@@ -15,7 +15,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: "manychat",
     name: "ManyChat",
-    icon: "💬",
+    monogram: "MC",
     color: "#0084FF",
     description: "Automate Instagram DMs and Facebook Messenger to qualify leads 24/7. Connect ManyChat flows to your RealtyOS inquiry link.",
     features: [
@@ -29,11 +29,11 @@ const INTEGRATIONS: Integration[] = [
   {
     id: "instagram",
     name: "Instagram",
-    icon: "📸",
+    monogram: "IG",
     color: "#E1306C",
     description: "Turn Instagram content into a lead machine. Bio link, Story mentions, and Reel CTAs all route to Sloane.",
     features: [
-      "Smart bio link → inquiry form",
+      "Smart bio link to inquiry form",
       "Story link stickers to Sloane",
       "Keyword-based DM triage",
       "Post-level lead attribution",
@@ -43,8 +43,8 @@ const INTEGRATIONS: Integration[] = [
   {
     id: "tiktok",
     name: "TikTok",
-    icon: "🎵",
-    color: "#000000",
+    monogram: "TT",
+    color: "#111827",
     description: "Capture leads from TikTok without breaking the scroll. Your bio link opens a Sloane-powered inquiry page.",
     features: [
       "Bio link with agent tracking",
@@ -57,11 +57,11 @@ const INTEGRATIONS: Integration[] = [
   {
     id: "facebook",
     name: "Facebook Lead Ads",
-    icon: "📘",
+    monogram: "f",
     color: "#1877F2",
     description: "Sync Facebook Lead Ad submissions directly into your pipeline, pre-qualified by Sloane before agent handoff.",
     features: [
-      "Direct Lead Ad → RealtyOS sync",
+      "Direct Lead Ad to RealtyOS sync",
       "AI pre-qualification",
       "Marketplace listing auto-response",
       "Retargeting pixel integration",
@@ -71,7 +71,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: "zapier",
     name: "Zapier",
-    icon: "⚡",
+    monogram: "Z",
     color: "#FF4A00",
     description: "Connect RealtyOS to 5,000+ apps. Automate routing, notifications, CRM updates, and follow-ups with no code.",
     features: [
@@ -85,7 +85,7 @@ const INTEGRATIONS: Integration[] = [
   {
     id: "whatsapp",
     name: "WhatsApp Business",
-    icon: "📱",
+    monogram: "W",
     color: "#25D366",
     description: "Let prospects inquire via WhatsApp. Sloane handles the conversation in their preferred channel.",
     features: [
@@ -132,7 +132,7 @@ export default function AutomationsPage() {
                   placeItems: "center",
                   fontWeight: "800",
                   fontSize: "0.85rem",
-                  color: "#F25C05",
+                  color: "#ff7300",
                   marginBottom: "12px",
                 }}
               >
@@ -173,12 +173,15 @@ export default function AutomationsPage() {
                       height: "42px",
                       borderRadius: "10px",
                       background: intg.color + "18",
+                      color: intg.color,
                       display: "grid",
                       placeItems: "center",
-                      fontSize: "1.3rem",
+                      fontWeight: 800,
+                      fontSize: "0.95rem",
+                      letterSpacing: "-0.02em",
                     }}
                   >
-                    {intg.icon}
+                    {intg.monogram}
                   </div>
                   <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: "700", color: "#0F172A" }}>{intg.name}</h3>
                 </div>
@@ -229,7 +232,7 @@ export default function AutomationsPage() {
             href="/admin/register"
             style={{
               display: "inline-block",
-              background: "#F25C05",
+              background: "#ff7300",
               color: "#FFFFFF",
               padding: "14px 32px",
               borderRadius: "8px",

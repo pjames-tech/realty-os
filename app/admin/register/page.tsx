@@ -52,10 +52,19 @@ export default function RegisterPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
-      const data = await res.json();
-      
+
+      let data: Record<string, unknown> = {};
+      try {
+        data = await res.json();
+      } catch {
+        // Server returned empty or non-JSON body (e.g. crash, HTML error page)
+        if (!res.ok) {
+          throw new Error(`Server error (${res.status}). Please try again.`);
+        }
+      }
+
       if (!res.ok) {
-        throw new Error(data.error || "Registration failed");
+        throw new Error((data.error as string) || "Registration failed");
       }
       
       // Redirect to login or auto-login

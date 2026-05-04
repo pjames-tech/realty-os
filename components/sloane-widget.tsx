@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Route } from "next";
+import { Icon } from "./icons";
 
 type ViewState = "closed" | "welcome" | "chat";
 type ChatMode = "lead" | "ai" | null;
@@ -158,7 +159,7 @@ export function SloaneWidget() {
     setMode("ai");
     setViewState("chat");
     const demoMessages: AssistantMessage[] = [
-      { role: "assistant", content: "👋 Welcome to the RealtyOS demo! Let me show you how Sloane qualifies a lead in under 60 seconds." },
+      { role: "assistant", content: "Welcome to the RealtyOS demo! Let me show you how Sloane qualifies a lead in under 60 seconds." },
     ];
     setMessages(demoMessages);
 
@@ -168,7 +169,7 @@ export function SloaneWidget() {
       { role: "user", content: "Around $450,000" },
       { role: "assistant", content: "Perfect. And what's your timeline — are you looking to move in the next 30 days, 60 days, or longer?" },
       { role: "user", content: "Within the next 2 months" },
-      { role: "assistant", content: "✅ Lead qualified! Here's the summary:\n\n• **Location:** Austin, TX\n• **Budget:** $450,000\n• **Timeline:** 30-60 days\n• **Type:** 3BR Home\n• **Score:** 92/100 ⭐\n\nThis lead is now tagged as **Hot** and pushed to the agent's CRM automatically." },
+      { role: "assistant", content: "Lead qualified. Here is the summary:\n\n• **Location:** Austin, TX\n• **Budget:** $450,000\n• **Timeline:** 30-60 days\n• **Type:** 3BR Home\n• **Score:** 92/100\n\nThis lead is now tagged as **Hot** and pushed to the agent's CRM automatically." },
     ];
 
     let i = 0;
@@ -359,17 +360,17 @@ export function SloaneWidget() {
                   <Image src="/sloane-avatar.png" alt="Sloane" width={80} height={80} />
                 </div>
                 <div>
-                  <h3>Hey there! 👋</h3>
+                  <h3>Hey there</h3>
                   <p>{welcomeGreeting}</p>
                 </div>
                 <div className="sloane-mode-btns">
                   {(isInquiry || isPortal || isLanding) && (
                     <button className="sloane-mode-btn" onClick={isLanding ? startDemo : startLeadCapture}>
-                      <span>🏠</span> {isLanding ? "See a Demo" : "Find a Property"}
+                      <span style={{ display: "inline-flex", alignItems: "center" }} aria-hidden="true"><Icon.Home size={16} /></span> {isLanding ? "See a Demo" : "Find a Property"}
                     </button>
                   )}
                   <button className="sloane-mode-btn" onClick={startAIChat}>
-                    <span>💬</span> {isLanding ? "Ask About RealtyOS" : isAgentDash || isAdminDash ? "Get Help" : "Ask a Question"}
+                    <span style={{ display: "inline-flex", alignItems: "center" }} aria-hidden="true"><Icon.Message size={16} /></span> {isLanding ? "Ask About RealtyOS" : isAgentDash || isAdminDash ? "Get Help" : "Ask a Question"}
                   </button>
                 </div>
               </motion.div>

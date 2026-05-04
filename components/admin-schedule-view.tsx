@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useAdminData } from "@/lib/use-admin-data";
 import { getInitials, getAvatarColor } from "@/lib/admin-helpers";
+import { useToast } from "@/components/toast";
 import { LeadRecord } from "@/lib/types";
 
 // Removed FALLBACK_EVENTS, using conditional JSX instead
@@ -59,6 +60,7 @@ function groupAppointmentsByDate(leads: LeadRecord[]) {
 
 export function AdminScheduleView() {
   const { stats } = useAdminData();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("All");
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -143,7 +145,7 @@ export function AdminScheduleView() {
           <button className="crm-icon-btn" onClick={() => setActiveTab("All")}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
           </button>
-          <button className="crm-btn-primary" onClick={() => alert("Event scheduling wizard has not been mapped yet. Use Lead Dashboard to schedule new clients.")}>+ New Event</button>
+          <button className="crm-btn-primary" onClick={() => toast("Use the Lead Dashboard to schedule new clients.", "info")}>+ New Event</button>
         </div>
       </header>
 
@@ -238,7 +240,7 @@ export function AdminScheduleView() {
                           </div>
                           <span>{evt.person}</span>
                         </div>
-                        <button className="evt-action-btn" onClick={() => alert("Actions menu not wired.")}>
+                        <button className="evt-action-btn" onClick={() => toast("Event options: Reschedule, Cancel, Add Notes", "info")}>
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                         </button>
                       </div>

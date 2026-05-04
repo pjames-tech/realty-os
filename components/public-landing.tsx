@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { Icon } from "./icons";
 
 /* ── Counting animation hook ── */
 function useCountUp(end: number, suffix: string, duration: number = 1800) {
@@ -91,9 +92,9 @@ const FEATURES = [
 ];
 
 const BENEFITS = [
-  { icon: "🔗", title: "Seamless CRM Integration", desc: "Pushes data directly to Follow Up Boss, Salesforce, and HubSpot." },
-  { icon: "📱", title: "Mobile Intake Forms", desc: "Clean, mobile-first lead forms that convert at 2x the industry average." },
-  { icon: "📅", title: "Automatic Calendar Booking", desc: "Leads book directly onto your agent's calendars post-qualification." },
+  { icon: <Icon.Link size={22} />, title: "Seamless CRM Integration", desc: "Pushes data directly to Follow Up Boss, Salesforce, and HubSpot." },
+  { icon: <Icon.Mobile size={22} />, title: "Mobile Intake Forms", desc: "Clean, mobile-first lead forms that convert at 2x the industry average." },
+  { icon: <Icon.Calendar size={22} />, title: "Automatic Calendar Booking", desc: "Leads book directly onto your agent's calendars post-qualification." },
 ];
 
 const PRICING_PLANS = [
@@ -103,10 +104,10 @@ const PRICING_PLANS = [
 ];
 
 const RESOURCES = [
-  { icon: "📖", title: "Documentation", desc: "Explore the full RealtyOS platform architecture and API reference.", link: "/docs" },
-  { icon: "🎓", title: "Getting Started Guide", desc: "A step-by-step walkthrough for new agents setting up their first pipeline.", link: "/getting-started" },
-  { icon: "💬", title: "Community Forum", desc: "Connect with other real estate professionals using RealtyOS.", link: "/community" },
-  { icon: "📹", title: "Video Tutorials", desc: "Watch short demos of key features like lead qualification and booking.", link: "/tutorials" },
+  { icon: <Icon.Book size={22} />, title: "Documentation", desc: "Explore the full RealtyOS platform architecture and API reference.", link: "/docs" },
+  { icon: <Icon.Hat size={22} />, title: "Getting Started Guide", desc: "A step-by-step walkthrough for new agents setting up their first pipeline.", link: "/getting-started" },
+  { icon: <Icon.Message size={22} />, title: "Community Forum", desc: "Connect with other real estate professionals using RealtyOS.", link: "/community" },
+  { icon: <Icon.Video size={22} />, title: "Video Tutorials", desc: "Watch short demos of key features like lead qualification and booking.", link: "/tutorials" },
 ];
 
 export function PublicLanding() {
@@ -142,7 +143,7 @@ export function PublicLanding() {
       <header className="b2b-header">
         <Link className="b2b-logo" href="/">
           <span className="b2b-logo-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1" fill="#F25C05"/><rect x="14" y="3" width="7" height="5" rx="1" fill="#F25C05"/><rect x="14" y="12" width="7" height="9" rx="1" fill="#F25C05"/><rect x="3" y="16" width="7" height="5" rx="1" fill="#F25C05"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1" fill="#ff7300"/><rect x="14" y="3" width="7" height="5" rx="1" fill="#ff7300"/><rect x="14" y="12" width="7" height="9" rx="1" fill="#ff7300"/><rect x="3" y="16" width="7" height="5" rx="1" fill="#ff7300"/></svg>
           </span>
           <strong>RealtyOS</strong>
         </Link>
@@ -165,9 +166,11 @@ export function PublicLanding() {
           <h1>Zero-Latency<br />Lead<br />Engagement.</h1>
           <p>Qualify, tag, and book appointments without human intervention. RealtyOS bridges the gap between lead generation and closed deals.</p>
           <div className="b2b-hero-cta">
-            <Link href="/admin/register" className="b2b-btn-primary-lg">Get Started for Free →</Link>
+            <Link href="/admin/register" className="b2b-btn-primary-lg">
+              Get Started for Free <Icon.ArrowRight size={16} />
+            </Link>
             <Link href={"/demo" as any} className="b2b-btn-outline-lg">
-              <span className="b2b-play-icon">▶</span> Watch Demo
+              <Icon.Play size={14} /> Watch Demo
             </Link>
           </div>
         </div>
@@ -250,7 +253,9 @@ export function PublicLanding() {
               </div>
               <p className="b2b-pricing-desc">{plan.desc}</p>
               <ul className="b2b-pricing-features">
-                {plan.features.map((f) => (<li key={f}>✓ {f}</li>))}
+                {plan.features.map((f) => (
+                  <li key={f}><Icon.Check size={16} /> <span>{f}</span></li>
+                ))}
               </ul>
               <Link href="/admin/register" className={plan.highlight ? "b2b-btn-primary-lg" : "b2b-btn-outline-lg"} style={{ width: "100%", justifyContent: "center", textDecoration: "none" }}>
                 {plan.cta}
@@ -298,7 +303,7 @@ export function PublicLanding() {
           <div className="b2b-footer-brand">
             <div className="b2b-footer-logo">
               <span className="b2b-logo-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1" fill="#F25C05"/><rect x="14" y="3" width="7" height="5" rx="1" fill="#F25C05"/><rect x="14" y="12" width="7" height="9" rx="1" fill="#F25C05"/><rect x="3" y="16" width="7" height="5" rx="1" fill="#F25C05"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1" fill="#ff7300"/><rect x="14" y="3" width="7" height="5" rx="1" fill="#ff7300"/><rect x="14" y="12" width="7" height="9" rx="1" fill="#ff7300"/><rect x="3" y="16" width="7" height="5" rx="1" fill="#ff7300"/></svg>
               </span>
               <strong>RealtyOS</strong>
             </div>

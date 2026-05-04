@@ -18,7 +18,7 @@ export default function DocsPage() {
               all from different vendors, none speaking to each other. Leads drop, responses drag, and clients feel like tickets.
             </p>
           </div>
-          <div style={{ background: "#FFF6F0", border: "1px solid #FDBA74", borderRadius: "12px", padding: "20px", borderLeft: "4px solid #F25C05" }}>
+          <div style={{ background: "#FFF6F0", border: "1px solid #FDBA74", borderRadius: "12px", padding: "20px", borderLeft: "4px solid #ff7300" }}>
             <h2 style={{ fontSize: "1.3rem", fontWeight: "800", color: "#C04904", margin: "0 0 12px 0" }}>The solution</h2>
             <p style={{ color: "#9A3412", lineHeight: 1.7, margin: 0, fontWeight: "500" }}>
               An AI-native, multi-tenant operating system built vertically for real estate. Client portal, agent dashboard, and AI receptionist unified in one instant-sync architecture.

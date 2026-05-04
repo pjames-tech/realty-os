@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+import { useToast } from "@/components/toast";
 
 export function TeamManagement() {
   const [email, setEmail] = useState("");
   const [generating, setGenerating] = useState(false);
   const [inviteLink, setInviteLink] = useState("");
   const [error, setError] = useState("");
+  const { toast } = useToast();
 
   async function handleInvite(e: React.FormEvent) {
     e.preventDefault();
@@ -37,7 +39,7 @@ export function TeamManagement() {
 
   function copyToClipboard() {
     navigator.clipboard.writeText(window.location.origin + inviteLink);
-    alert("Invitation link copied to clipboard!");
+    toast("Invitation link copied to clipboard!");
   }
 
   return (

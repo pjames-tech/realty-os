@@ -37,10 +37,15 @@ export function AdminLogin({ nextUrl = "/admin" }: { nextUrl?: string }) {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      let data: Record<string, unknown> = {};
+      try {
+        data = await response.json();
+      } catch {
+        // Server returned empty or non-JSON body
+      }
       if (response.ok && data.name) {
-        localStorage.setItem("realtyos-admin-name", data.name);
-        localStorage.setItem("realtyos-admin-role", data.role);
+        localStorage.setItem("realtyos-admin-name", data.name as string);
+        localStorage.setItem("realtyos-admin-role", data.role as string);
       }
 
       router.push(nextUrl as Route);

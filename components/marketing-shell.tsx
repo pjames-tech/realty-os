@@ -47,7 +47,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
         zIndex: 10,
       }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
-          <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#F25C05", display: "grid", placeItems: "center" }}>
+          <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#ff7300", display: "grid", placeItems: "center" }}>
             <svg width="18" height="18" fill="#fff" viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2 2h8v2H8V8zm0 4h5v2H8v-2z" /></svg>
           </div>
           <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "#1E293B" }}>RealtyOS</span>
@@ -59,7 +59,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
           <Link href="/admin/login" style={{ color: "#475569", textDecoration: "none", fontSize: "0.9rem", fontWeight: "500" }}>Sign In</Link>
           <Link href="/inquiry" style={{
             padding: "8px 16px",
-            background: "#F25C05",
+            background: "#ff7300",
             color: "#FFF",
             textDecoration: "none",
             borderRadius: "8px",
@@ -86,7 +86,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", marginBottom: "32px" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-                <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#F25C05", display: "grid", placeItems: "center" }}>
+                <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#ff7300", display: "grid", placeItems: "center" }}>
                   <svg width="18" height="18" fill="#fff" viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2 2h8v2H8V8zm0 4h5v2H8v-2z" /></svg>
                 </div>
                 <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "#1E293B" }}>RealtyOS</span>
@@ -128,7 +128,7 @@ export function MarketingHero({ kicker, title, subtitle }: { kicker?: string; ti
     <section style={{ padding: "80px 32px 48px", textAlign: "center" }}>
       <div style={{ maxWidth: "800px", margin: "0 auto" }}>
         {kicker && (
-          <div style={{ color: "#F25C05", fontSize: "0.8rem", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "12px" }}>
+          <div style={{ color: "#ff7300", fontSize: "0.8rem", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "12px" }}>
             {kicker}
           </div>
         )}
@@ -155,10 +155,24 @@ export function MarketingSection({ children, background }: { children: ReactNode
   );
 }
 
-export function FeatureCard({ icon, title, description }: { icon: string; title: string; description: string }) {
+export function FeatureCard({ icon, title, description }: { icon: ReactNode; title: string; description: string }) {
   return (
     <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: "12px", padding: "28px" }}>
-      <div style={{ fontSize: "2rem", marginBottom: "16px" }}>{icon}</div>
+      <div
+        style={{
+          width: "44px",
+          height: "44px",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#FFF7ED",
+          color: "#ff7300",
+          borderRadius: "10px",
+          marginBottom: "16px",
+        }}
+      >
+        {icon}
+      </div>
       <h3 style={{ margin: "0 0 8px 0", fontSize: "1.1rem", fontWeight: "700", color: "#0F172A" }}>{title}</h3>
       <p style={{ margin: 0, color: "#64748B", fontSize: "0.95rem", lineHeight: 1.6 }}>{description}</p>
     </div>

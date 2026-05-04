@@ -24,7 +24,7 @@ export function SuperAdminPlatformStats() {
     <div style={{ display: "flex", flexDirection: "column", gap: "32px", fontFamily: "var(--font-sans)" }}>
       {/* Header */}
       <div>
-        <div style={{ color: "#F25C05", fontSize: "0.75rem", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Performance</div>
+        <div style={{ color: "#ff7300", fontSize: "0.75rem", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Performance</div>
         <h1 style={{ fontSize: "2rem", fontWeight: "800", color: "#0F172A", margin: "0 0 8px 0", letterSpacing: "-0.02em" }}>Platform Statistics</h1>
         <p style={{ color: "#64748B", margin: 0, fontSize: "0.95rem" }}>Real-time analytics across all agencies and AI systems.</p>
       </div>
@@ -64,7 +64,7 @@ export function SuperAdminPlatformStats() {
                 <span style={{ color: "#0F172A" }}>{avgLatency}ms</span>
               </div>
               <div style={{ width: "100%", height: "6px", background: "#F1F5F9", borderRadius: "3px" }}>
-                <div style={{ width: `${Math.min(100, (avgLatency / 3000) * 100)}%`, height: "100%", background: "#F25C05", borderRadius: "3px" }}></div>
+                <div style={{ width: `${Math.min(100, (avgLatency / 3000) * 100)}%`, height: "100%", background: "#ff7300", borderRadius: "3px" }}></div>
               </div>
             </div>
             <div>
@@ -84,7 +84,7 @@ export function SuperAdminPlatformStats() {
           <h2 style={{ fontSize: "1.2rem", fontWeight: "700", color: "#0F172A", margin: "0 0 24px 0" }}>Lead Source Distribution</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             {[
-              { name: "Sloane Chatbot", pct: 68, color: "#F25C05" },
+              { name: "Sloane Chatbot", pct: 68, color: "#ff7300" },
               { name: "Website Form", pct: 22, color: "#3B82F6" },
               { name: "Portal Inquiry", pct: 10, color: "#10B981" }
             ].map(src => (
